@@ -3,8 +3,6 @@
 #include "ui.hpp"
 // for gVg
 #include "window.hpp"
-// for key codes
-#include <GLFW/glfw3.h>
 using namespace rack;
 
 #include "trowaSoftComponents.hpp"
@@ -117,23 +115,6 @@ void TSTextField::draw(NVGcontext *vg) {
 	}
 } // end draw()
 
-// Request focus on this field.
-void TSTextField::requestFocus() {
-	if (gFocusedWidget) {
-		EventDefocus evt;
-		gFocusedWidget->onDefocus(evt);
-		gFocusedWidget = NULL;
-	}
-	gFocusedWidget = this;	
-	{
-		EventFocus eFocus;
-		onFocus(eFocus);
-		cursor = 0;
-		selection = text.length();
-	}
-	return;
-} // end requestFocus()
-
 // Remove invalid chars from input.
 std::string TSTextField::cleanseString(std::string newText)
 {
@@ -167,23 +148,6 @@ void TSTextField::insertText(std::string newText) {
 	return;
 } // end insertText()
 
-// On Key
-void TSTextField::onText(EventText &e) {
-	if (enabled)
-	{
-		if (e.codepoint < 128) {
-			std::string newText(1, (char)e.codepoint);
-			//insertText(newText);
-			if ((allowedTextType == TextType::Any || regex_match(newText, regexChar)) && text.length() < maxLength)
-			{
-				insertText(newText);
-			}
-		}
-	}
-	e.consumed = true;
-	return;
-} // end onText()
-
 void TSTextField::setText(std::string text) {
 	this->text = cleanseString(text);
 	selection = cursor = text.size();
@@ -197,183 +161,3 @@ void TSTextField::onTextChange() {
 	//debug("onTextChange() - New cursor: %d", cursor);
 	return;
 } // end onTextChanged()
-
-// On key press.
-void TSTextField::onKey(EventKey &e) {
-	if (!visible)
-	{
-		// Do not capture the keys.
-		e.consumed = false;
-		return;
-	}
-	if (!enabled)
-	{
-		e.consumed = false; // We are ingoring this.
-		return;
-	}
-	// We can throw invalid chars away in onText(), so we don't have to check here anymore.
-	//// Flag if we need to validate/cleanse this character (only if printable and if we are doing validation).
-	//bool checkKey = (this->allowedTextType != TextType::Any) && isPrintableKey(e.key);
-	switch (e.key) {
-		case GLFW_KEY_TAB:
-			// If we have an event to fire, then do it
-			if (windowIsShiftPressed())//(guiIsShiftPressed())
-			{
-				if (onShiftTabCallback != NULL)
-				{			
-					onShiftTabCallback(id);
-				}
-				else if (prevField != NULL)
-				{
-					TSTextField* fField = prevField;
-					if (!fField->visible)
-					{
-						switch (tabNextHiddenAction)
-						{
-						case TabFieldHiddenAction::MoveToNextVisibleTabField:
-							fField = fField->prevField;
-							while (fField != NULL && !fField->visible && fField != this && !fField->canTabToThisEnabled)
-								fField = fField->prevField;
-							if (fField == this || (fField != NULL && !fField->visible))
-								fField = NULL;
-							break;
-						case TabFieldHiddenAction::ShowHiddenTabToField:
-							while (fField != NULL && fField != this && !fField->canTabToThisEnabled)
-								fField = fField->prevField;
-							if (fField == this || (fField != NULL && !fField->canTabToThisEnabled))
-								fField = NULL;
-							if (fField != NULL)
-								fField->visible = true;
-							break;
-						case TabFieldHiddenAction::DoNothing:
-						default:
-							fField = NULL;
-							break;
-						}
-					}
-					if (fField != NULL)
-					{
-						fField->requestFocus();
-					}
-				} // end if previous field
-			}
-			else if (onTabCallback != NULL)
-			{
-				onTabCallback(id);
-			}
-			else if (nextField != NULL)
-			{
-				TSTextField* fField = nextField;
-				if (!fField->visible)
-				{
-					switch (tabNextHiddenAction)
-					{
-					case TabFieldHiddenAction::MoveToNextVisibleTabField:
-						fField = fField->nextField;
-						while (fField != NULL && !fField->visible && fField != this && !fField->canTabToThisEnabled)
-							fField = fField->nextField;
-						if (fField == this || (fField != NULL && !fField->visible))
-							fField = NULL;
-						break;
-					case TabFieldHiddenAction::ShowHiddenTabToField:
-						while (fField != NULL && fField != this && !fField->canTabToThisEnabled)
-							fField = fField->nextField;
-						if (fField == this || (fField != NULL && !fField->canTabToThisEnabled))
-							fField = NULL;
-						if (fField != NULL)
-							fField->visible = true;
-						break;
-					case TabFieldHiddenAction::DoNothing:
-					default:
-						fField = NULL;
-						break;
-					}
-				}
-				if (fField != NULL)
-				{
-					fField->requestFocus();
-				}
-			} // end if next field
-			break;
-		case GLFW_KEY_KP_ENTER:
-		{
-			// Key pad enter should also trigger event action
-			EventAction evt;
-			onAction(evt);
-		}
-			break;
-		default:
-			// Call base method
-			TextField::onKey(e);
-			break;
-	}
-	cursor = clamp(cursor, 0, text.size());
-	selection = clamp(selection, 0, text.size());
-	e.consumed = true;
-	return;
-} // end onKey()
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-// isPrintableKey()
-// @keyCode : (IN) The key that is pressed.
-// @returns: True if the key represents a printable character, false if not.
-//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-bool isPrintableKey(int key)
-{
-	bool isPrintable = false;
-	switch (key)
-	{
-	case GLFW_KEY_SPACE:
-	case GLFW_KEY_APOSTROPHE:
-	case GLFW_KEY_COMMA:
-	case GLFW_KEY_MINUS:
-	case GLFW_KEY_PERIOD:
-	case GLFW_KEY_SLASH:
-	case GLFW_KEY_0:
-	case GLFW_KEY_1:
-	case GLFW_KEY_2:
-	case GLFW_KEY_3:
-	case GLFW_KEY_4:
-	case GLFW_KEY_5:
-	case GLFW_KEY_6:
-	case GLFW_KEY_7:
-	case GLFW_KEY_8:
-	case GLFW_KEY_9:
-	case GLFW_KEY_SEMICOLON:
-	case GLFW_KEY_EQUAL:
-	case GLFW_KEY_A:
-	case GLFW_KEY_B:
-	case GLFW_KEY_C:
-	case GLFW_KEY_D:
-	case GLFW_KEY_E:
-	case GLFW_KEY_F:
-	case GLFW_KEY_G:
-	case GLFW_KEY_H:
-	case GLFW_KEY_I:
-	case GLFW_KEY_J:
-	case GLFW_KEY_K:
-	case GLFW_KEY_L:
-	case GLFW_KEY_M:
-	case GLFW_KEY_N:
-	case GLFW_KEY_O:
-	case GLFW_KEY_P:
-	case GLFW_KEY_Q:
-	case GLFW_KEY_R:
-	case GLFW_KEY_S:
-	case GLFW_KEY_T:
-	case GLFW_KEY_U:
-	case GLFW_KEY_V:
-	case GLFW_KEY_W:
-	case GLFW_KEY_X:
-	case GLFW_KEY_Y:
-	case GLFW_KEY_Z:
-	case GLFW_KEY_LEFT_BRACKET:
-	case GLFW_KEY_BACKSLASH:
-	case GLFW_KEY_RIGHT_BRACKET:
-	case GLFW_KEY_GRAVE_ACCENT:
-	case GLFW_KEY_WORLD_1:
-	case GLFW_KEY_WORLD_2:
-		isPrintable = true;
-		break;
-	}
-	return isPrintable;
-} // end isPrintableKey()

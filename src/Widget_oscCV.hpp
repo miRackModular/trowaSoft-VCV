@@ -51,7 +51,7 @@ struct oscCVWidget : TSSModuleWidgetBase {
 	/// TODO: Move this to someplace else
 	static const NVGcolor CHANNEL_COLORS[TROWA_OSCCV_NUM_COLORS];
 	// Plug lights
-	bool plugLightsEnabled = true;
+	bool plugLightsEnabled = false;
 
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// oscCVWidget()

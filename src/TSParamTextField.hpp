@@ -8,10 +8,6 @@
 struct TSParamTextField : TSTextField {
 	// The param widget this text field should be attached to.
 	ParamWidget* control = NULL;
-	// Pointer to dirty (if control is FrameBufferWidget)
-	bool* isDirty = NULL;
-	// If the control needs dirty set.
-	bool isBufferedCtrl = false;
 	// The format string to use (if any).
 	const char* formatString;
 	// Translate knob value to text value.
@@ -19,7 +15,7 @@ struct TSParamTextField : TSTextField {
 	// Translate text value to knob value.
 	float(*text2KnobVal)(float) = NULL;
 	// This field is currently being edited.
-	char isEditing = 0;
+	bool isEditing = 0;
 	// Last control value.
 	float lastControlVal = -10000;
 
@@ -54,17 +50,20 @@ struct TSParamTextField : TSTextField {
 	// onAction()
 	// Save value if valid.
 	//-----------------------------------------------------------------------------------------------
-	void onAction(EventAction &e) override;
+	// void onAction(EventAction &e) override;
 	//-----------------------------------------------------------------------------------------------
 	// onFocus()
 	// Set flag to not update from the control.
 	//-----------------------------------------------------------------------------------------------
 	void onFocus(EventFocus &e) override
 	{
+		if (!enabled)
+			return;
 		e.consumed = true;
-		isEditing = 3;
+		isEditing = 1;
 		selection = 0;
 		cursor = text.size();
+		TextField::onFocus(e);
 		return;
 	}
 	//-----------------------------------------------------------------------------------------------
@@ -78,4 +77,10 @@ struct TSParamTextField : TSTextField {
 	// Uses the format string.
 	//-----------------------------------------------------------------------------------------------
 	void setText(float val);
+
+	void draw(NVGcontext *vg) {
+		if (isEditing)
+			TSTextField::draw(vg);
+	}
+
 };

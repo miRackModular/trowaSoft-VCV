@@ -106,34 +106,34 @@ void voltSeq::setStepValue(int step, float val, int channel, int pattern)
 				gateTriggers[step].state = SchmittTrigger::LOW;
 		}
 	}
-	oscMutex.lock();
-	if (useOSC && oscInitialized)
-	{
-		// Send the result back
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-		debug("voltSeq:step() - Received a msg (s=%d, v=%0.2f, c=%d, p=%d), sending back (%s).",
-			step, val, channel, pattern,
-			oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
-#endif
-		char valOutputBuffer[20] = { 0 };
-		char addrBuff[50] = { 0 };
-		float val = roundValForOSC(triggerState[pattern][channel][step]);
-		ValueModes[selectedOutputValueMode]->GetDisplayString(ValueModes[selectedOutputValueMode]->GetOutputValue(triggerState[pattern][channel][step]), valOutputBuffer);
+// 	oscMutex.lock();
+// 	if (useOSC && oscInitialized)
+// 	{
+// 		// Send the result back
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 		debug("voltSeq:step() - Received a msg (s=%d, v=%0.2f, c=%d, p=%d), sending back (%s).",
+// 			step, val, channel, pattern,
+// 			oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
+// #endif
+// 		char valOutputBuffer[20] = { 0 };
+// 		char addrBuff[50] = { 0 };
+// 		float val = roundValForOSC(triggerState[pattern][channel][step]);
+// 		ValueModes[selectedOutputValueMode]->GetDisplayString(ValueModes[selectedOutputValueMode]->GetOutputValue(triggerState[pattern][channel][step]), valOutputBuffer);
 
-		sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], step + 1);
-		osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
-		oscStream << osc::BeginBundleImmediate
-			<< osc::BeginMessage(addrBuff)
-			<< val // Rounded value for touchOSC
-			<< osc::EndMessage;
-		sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], step + 1);
-		oscStream << osc::BeginMessage( addrBuff )
-			<< valOutputBuffer // String version of the value (touchOSC needs this)
-			<< osc::EndMessage
-			<< osc::EndBundle;
-		oscTxSocket->Send(oscStream.Data(), oscStream.Size());
-	}
-	oscMutex.unlock();
+// 		sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], step + 1);
+// 		osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
+// 		oscStream << osc::BeginBundleImmediate
+// 			<< osc::BeginMessage(addrBuff)
+// 			<< val // Rounded value for touchOSC
+// 			<< osc::EndMessage;
+// 		sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], step + 1);
+// 		oscStream << osc::BeginMessage( addrBuff )
+// 			<< valOutputBuffer // String version of the value (touchOSC needs this)
+// 			<< osc::EndMessage
+// 			<< osc::EndBundle;
+// 		oscTxSocket->Send(oscStream.Data(), oscStream.Size());
+// 	}
+// 	oscMutex.unlock();
 
 	// Set our knobs
 	if (pattern == currentPatternEditingIx && channel == currentChannelEditingIx)
@@ -257,25 +257,25 @@ void voltSeq::step()
 	lastOutputValueMode = selectedOutputValueMode;
 		
 	// Only send OSC if it is enabled, initialized, and we are in EDIT mode.
-	sendOSC = useOSC && currentCtlMode == ExternalControllerMode::EditMode && oscInitialized;
+	// sendOSC = useOSC && currentCtlMode == ExternalControllerMode::EditMode && oscInitialized;
 	//-- * Load the trigger we are editing into our button matrix for display:
 	// This is what we are showing not what we playing
 	char valOutputBuffer[20] = { 0 };
 	char addrBuff[100] = { 0 };
-	std::string stepStringAddr = std::string(oscAddrBuffer[SeqOSCOutputMsg::EditStepString]);
+	// std::string stepStringAddr = std::string(oscAddrBuffer[SeqOSCOutputMsg::EditStepString]);
 	if (reloadMatrix || reloadEditMatrix || valueModeChanged)
 	{
 		reloadEditMatrix = false;
-		oscMutex.lock();
-		osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
-		if (sendOSC && oscInitialized)
-		{
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-			debug("Sending reload matrix: %s.", oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
-#endif
-			oscStream << osc::BeginBundleImmediate;
-		}
-		oscMutex.unlock();
+// 		oscMutex.lock();
+// 		osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
+// 		if (sendOSC && oscInitialized)
+// 		{
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 			debug("Sending reload matrix: %s.", oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
+// #endif
+// 			oscStream << osc::BeginBundleImmediate;
+// 		}
+// 		oscMutex.unlock();
 		// Load this channel into our 4x4 matrix
 		for (int s = 0; s < maxSteps; s++) 
 		{
@@ -286,76 +286,76 @@ void voltSeq::step()
 			this->params[CHANNEL_PARAM + s].value = this->triggerState[currentPatternEditingIx][currentChannelEditingIx][s];
 			knobStepMatrix[r][c]->setKnobValue(this->triggerState[currentPatternEditingIx][currentChannelEditingIx][s]);			
 			lights[PAD_LIGHTS + s].value = gateLights[r][c];
-			oscMutex.lock();
-			if (sendOSC && oscInitialized)
-			{
-				// Each step may have up to 4-ish messages, so send 4 or 8 steps at a time.
-				if (s > 0 && s % 8 == 0) // There is a limit to client buffer size, so let's not make the bundles too large. Hopefully they can take this many steps at a time.
-				{
-					// Send this bundle and then start a new one
-					oscStream << osc::EndBundle;
-					oscTxSocket->Send(oscStream.Data(), oscStream.Size());
-					oscStream.Clear();
-					// Start new bundle:
-					oscStream << osc::BeginBundleImmediate;
-				}
-				oscLastSentVals[s] = roundValForOSC(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]);
-				currOutputValueMode->GetDisplayString(currOutputValueMode->GetOutputValue(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]), valOutputBuffer);
-				// Step value:
-				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], s+1);
-				oscStream << osc::BeginMessage(addrBuff)
-					<< oscLastSentVals[s]
-					<< osc::EndMessage;
-				if (oscCurrentClient == OSCClient::touchOSCClient)
-				{
-					// Change color
-					sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, addrBuff);
-					oscStream << osc::BeginMessage(addrBuff)
-						<< touchOSC::ChannelColors[currentChannelEditingIx]
-						<< osc::EndMessage;
-					// LED Color (current step LED):
-					sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::PlayStepLed], s + 1);
-					sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, addrBuff);
-					oscStream << osc::BeginMessage(addrBuff)
-						<< touchOSC::ChannelColors[currentChannelEditingIx]
-						<< osc::EndMessage;
-				}
-				// Step String
-				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], s+1);
-				oscStream << osc::BeginMessage( addrBuff )
-					<< valOutputBuffer // String version of the value (touchOSC needs this)
-					<< osc::EndMessage;
-			}
-			oscMutex.unlock();
+			// oscMutex.lock();
+			// if (sendOSC && oscInitialized)
+			// {
+			// 	// Each step may have up to 4-ish messages, so send 4 or 8 steps at a time.
+			// 	if (s > 0 && s % 8 == 0) // There is a limit to client buffer size, so let's not make the bundles too large. Hopefully they can take this many steps at a time.
+			// 	{
+			// 		// Send this bundle and then start a new one
+			// 		oscStream << osc::EndBundle;
+			// 		oscTxSocket->Send(oscStream.Data(), oscStream.Size());
+			// 		oscStream.Clear();
+			// 		// Start new bundle:
+			// 		oscStream << osc::BeginBundleImmediate;
+			// 	}
+			// 	oscLastSentVals[s] = roundValForOSC(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]);
+			// 	currOutputValueMode->GetDisplayString(currOutputValueMode->GetOutputValue(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]), valOutputBuffer);
+			// 	// Step value:
+			// 	sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], s+1);
+			// 	oscStream << osc::BeginMessage(addrBuff)
+			// 		<< oscLastSentVals[s]
+			// 		<< osc::EndMessage;
+			// 	if (oscCurrentClient == OSCClient::touchOSCClient)
+			// 	{
+			// 		// Change color
+			// 		sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, addrBuff);
+			// 		oscStream << osc::BeginMessage(addrBuff)
+			// 			<< touchOSC::ChannelColors[currentChannelEditingIx]
+			// 			<< osc::EndMessage;
+			// 		// LED Color (current step LED):
+			// 		sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::PlayStepLed], s + 1);
+			// 		sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, addrBuff);
+			// 		oscStream << osc::BeginMessage(addrBuff)
+			// 			<< touchOSC::ChannelColors[currentChannelEditingIx]
+			// 			<< osc::EndMessage;
+			// 	}
+			// 	// Step String
+			// 	sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], s+1);
+			// 	oscStream << osc::BeginMessage( addrBuff )
+			// 		<< valOutputBuffer // String version of the value (touchOSC needs this)
+			// 		<< osc::EndMessage;
+			// }
+			// oscMutex.unlock();
 		} // end for
-		oscMutex.lock();
-		if (sendOSC && oscInitialized)
-		{
-			if (oscCurrentClient == OSCClient::touchOSCClient)
-			{
-				// Also change color on the Channel control:
-				sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, oscAddrBuffer[SeqOSCOutputMsg::EditChannel]);
-				oscStream << osc::BeginMessage(addrBuff)
-					<< touchOSC::ChannelColors[currentChannelEditingIx]
-					<< osc::EndMessage;
-			}
+		// oscMutex.lock();
+		// if (sendOSC && oscInitialized)
+		// {
+		// 	if (oscCurrentClient == OSCClient::touchOSCClient)
+		// 	{
+		// 		// Also change color on the Channel control:
+		// 		sprintf(addrBuff, OSC_TOUCH_OSC_CHANGE_COLOR_FS, oscAddrBuffer[SeqOSCOutputMsg::EditChannel]);
+		// 		oscStream << osc::BeginMessage(addrBuff)
+		// 			<< touchOSC::ChannelColors[currentChannelEditingIx]
+		// 			<< osc::EndMessage;
+		// 	}
 
-			// End last bundle and send:
-			oscStream << osc::EndBundle;
-			oscTxSocket->Send(oscStream.Data(), oscStream.Size());
-		}
-		oscMutex.unlock();
+		// 	// End last bundle and send:
+		// 	oscStream << osc::EndBundle;
+		// 	oscTxSocket->Send(oscStream.Data(), oscStream.Size());
+		// }
+		// oscMutex.unlock();
 	} // end if reload edit matrix
 	//-- * Read the buttons
 	else if (!valuesChanging) // Only read in if another thread isn't changing the values
 	{		
-		oscMutex.lock();
-		osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
-		if (sendOSC && oscInitialized)
-		{
-			oscStream << osc::BeginBundleImmediate;
-		}
-		oscMutex.unlock();
+		// oscMutex.lock();
+		// osc::OutboundPacketStream oscStream(oscBuffer, OSC_OUTPUT_BUFFER_SIZE);
+		// if (sendOSC && oscInitialized)
+		// {
+		// 	oscStream << osc::BeginBundleImmediate;
+		// }
+		// oscMutex.unlock();
 
 		int numChanged = 0;
 		const float threshold = TROWA_VOLTSEQ_KNOB_CHANGED_THRESHOLD;
@@ -372,40 +372,40 @@ void voltSeq::step()
 			gateLights[r][c] = stepLights[r][c];			
 			lights[PAD_LIGHTS + s].value = gateLights[r][c];
 
-			oscMutex.lock();
-			// This step has changed and we are doing OSC
-			if (sendLightVal && oscInitialized)
-			{		
-				oscLastSentVals[s] = roundValForOSC(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]);
-				// voltSeq should send the actual values.
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-				debug("Step changed %d (new val is %.4f), dv = %.4f, sending OSC %s", s, 
-					oscLastSentVals[s],
-					dv,
-					oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
-#endif
-				// Now also send the equivalent string:
-				currOutputValueMode->GetDisplayString(currOutputValueMode->GetOutputValue( triggerState[currentPatternEditingIx][currentChannelEditingIx][s] ), valOutputBuffer);
-				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], s + 1);
-				debug("Send: %s -> %s : %s", oscAddrBuffer[SeqOSCOutputMsg::EditStepString], addrBuff, valOutputBuffer);
-				oscStream << osc::BeginMessage(addrBuff)
-					<< oscLastSentVals[s]
-					<< osc::EndMessage;
-				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], s + 1);
-				oscStream << osc::BeginMessage(addrBuff)
-					<< valOutputBuffer // String version of the value (touchOSC needs this)
-					<< osc::EndMessage;
-				numChanged++;
-			} // end if send the value over OSC
-			oscMutex.unlock();
+// 			oscMutex.lock();
+// 			// This step has changed and we are doing OSC
+// 			if (sendLightVal && oscInitialized)
+// 			{		
+// 				oscLastSentVals[s] = roundValForOSC(triggerState[currentPatternEditingIx][currentChannelEditingIx][s]);
+// 				// voltSeq should send the actual values.
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 				debug("Step changed %d (new val is %.4f), dv = %.4f, sending OSC %s", s, 
+// 					oscLastSentVals[s],
+// 					dv,
+// 					oscAddrBuffer[SeqOSCOutputMsg::EditStep]);
+// #endif
+// 				// Now also send the equivalent string:
+// 				currOutputValueMode->GetDisplayString(currOutputValueMode->GetOutputValue( triggerState[currentPatternEditingIx][currentChannelEditingIx][s] ), valOutputBuffer);
+// 				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStep], s + 1);
+// 				debug("Send: %s -> %s : %s", oscAddrBuffer[SeqOSCOutputMsg::EditStepString], addrBuff, valOutputBuffer);
+// 				oscStream << osc::BeginMessage(addrBuff)
+// 					<< oscLastSentVals[s]
+// 					<< osc::EndMessage;
+// 				sprintf(addrBuff, oscAddrBuffer[SeqOSCOutputMsg::EditStepString], s + 1);
+// 				oscStream << osc::BeginMessage(addrBuff)
+// 					<< valOutputBuffer // String version of the value (touchOSC needs this)
+// 					<< osc::EndMessage;
+// 				numChanged++;
+// 			} // end if send the value over OSC
+// 			oscMutex.unlock();
 		} // end loop through step buttons
-		oscMutex.lock();
-		if (sendOSC && oscInitialized && numChanged > 0)
-		{
-			oscStream << osc::EndBundle;
-			oscTxSocket->Send(oscStream.Data(), oscStream.Size());
-		}
-		oscMutex.unlock();
+		// oscMutex.lock();
+		// if (sendOSC && oscInitialized && numChanged > 0)
+		// {
+		// 	oscStream << osc::EndBundle;
+		// 	oscTxSocket->Send(oscStream.Data(), oscStream.Size());
+		// }
+		// oscMutex.unlock();
 	} // end else (read button matrix)
 	
 	// Set Outputs (16 triggers)	

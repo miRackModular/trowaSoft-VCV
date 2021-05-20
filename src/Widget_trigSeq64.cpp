@@ -7,7 +7,7 @@
 #include "TSSequencerModuleBase.hpp"
 #include "Module_trigSeq.hpp"
 
-
+static int _groupId = 0;
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // trigSeq64Widget()
@@ -51,7 +51,7 @@ trigSeq64Widget::trigSeq64Widget(trigSeq* seqModule) : TSSequencerWidgetBase(seq
 		numCols = seqModule->numCols;
 		numRows = seqModule->numRows;
 		lightColor = seqModule->voiceColors[seqModule->currentChannelEditingIx];
-		groupId = seqModule->oscId; // Use this id for now since this is unique to each module instance.
+		groupId = ++_groupId; //seqModule->oscId; // Use this id for now since this is unique to each module instance.
 	}
 	int id = 0;
 	for (int r = 0; r < numRows; r++) //---------THE PADS

@@ -68,4 +68,6 @@ struct trigSeq64Widget : TSSequencerWidgetBase {
 	trigSeq64Widget(trigSeq* seqModule);
 };
 
+extern int _trowaGroupId;
+
 #endif

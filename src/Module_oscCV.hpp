@@ -17,6 +17,8 @@ using namespace rack;
 #include "../lib/oscpack/osc/OscReceivedElements.h"
 #include "../lib/oscpack/osc/OscPacketListener.h"
 
+#include "../lib/concurrentqueue.h"
+
 // Model for trowa OSC2CV
 extern Model* modelOscCV;
 
@@ -24,7 +26,7 @@ extern Model* modelOscCV;
 
 #define TROWA_OSCCV_DEFAULT_NUM_CHANNELS		8 // Default number of channels
 #define TROWA_OSCCV_NUM_PORTS_PER_INPUT			2 // Each input port should have a trigger input and actual value input.
-#define TROWA_OSCCV_DEFAULT_NAMESPACE		"trowacv" // Default namespace for this module (should not be the same as the sequencers)
+#define TROWA_OSCCV_DEFAULT_NAMESPACE		"" // Default namespace for this module (should not be the same as the sequencers)
 #define TROWA_OSCCV_MAX_VOLTAGE				 10.0 // Max output voltage
 #define TROWA_OSCCV_MIN_VOLTAGE				-10.0 // Min output voltage
 #define TROWA_OSCCV_VAL_BUFFER_SIZE			  512 // Buffer size for value history
@@ -253,6 +255,8 @@ struct TSOSCCVSimpleMessage {
 	float rxVal;
 	uint32_t uintRxVal;
 
+	TSOSCCVSimpleMessage() {}
+
 	TSOSCCVSimpleMessage(int chNum, float recvVal)
 	{
 		channelNum = chNum;
@@ -331,13 +335,14 @@ struct oscCV : Module {
 	TSOSCCVChannel* outputChannels = NULL;
 	PulseGenerator* pulseGens = NULL;
 	// The received messages.
-	std::queue<TSOSCCVSimpleMessage> rxMsgQueue;
+	// std::queue<TSOSCCVSimpleMessage> rxMsgQueue;
+	moodycamel::ConcurrentQueue<TSOSCCVSimpleMessage> rxMsgQueue;
 	SchmittTrigger* inputTriggers;
 
 	int oscId;
 	/// TODO: OSC members should be dumped into an OSC base class....
 	// Mutex for osc messaging.
-	std::mutex oscMutex;
+	// std::mutex oscMutex;
 	// Current OSC IP address and port settings.
 	TSOSCConnectionInfo currentOSCSettings = { OSC_ADDRESS_DEF,  OSC_OUTPORT_DEF , OSC_INPORT_DEF };
 	// OSC Configure trigger
@@ -445,7 +450,7 @@ struct oscCV : Module {
 	// reset(void)
 	// Initialize values.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	void reset() override;
+	void onReset() override;
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// toJson(void)
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-	

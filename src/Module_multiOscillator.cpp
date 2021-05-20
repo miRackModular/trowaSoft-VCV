@@ -305,7 +305,7 @@ multiOscillator::~multiOscillator()
 // reset(void)
 // Initialize values.
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-void multiOscillator::reset()
+void multiOscillator::onReset()
 {
 	for (int i = 0; i < numberOscillators; i++)
 	{

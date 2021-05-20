@@ -16,6 +16,8 @@ SOURCES = \
 		$(wildcard src/*.cpp) \
 		$(wildcard src/*/*.cpp) \
 
+SOURCES := $(filter-out src/TSOSCSequencerListener.cpp,$(SOURCES))
+
 # Careful about linking to libraries, since you can't assume much about the user's environment and library search path.
 # Static libraries are fine.
 include $(RACK_DIR)/arch.mk
@@ -29,8 +31,7 @@ else
 	SOURCES += $(wildcard lib/oscpack/ip/posix/*.cpp) 
 endif
 
-DISTRIBUTABLES += $(wildcard LICENSE*) res \
- pd other
+DISTRIBUTABLES += res
 # ^ add our other folders (supplementary files)
 
 include $(RACK_DIR)/plugin.mk

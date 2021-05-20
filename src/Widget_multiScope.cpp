@@ -483,21 +483,21 @@ void multiScopeWidget::step() {
 		{
 			display[wIx]->box.size.x = width;
 			// Change light colors on plugs
-			if (plugLightsEnabled)
+			// if (plugLightsEnabled)
 			{
 				//if (scopeModule->waveForms[wIx]->colorChanged) // When reloading from save, this doesn't work :(
 				{
-					inputPorts[multiScope::PEN_ON_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::ROTATION_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::TIME_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::X_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::Y_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::THICKNESS_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::PEN_ON_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::ROTATION_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::TIME_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::X_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::Y_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+					// inputPorts[multiScope::THICKNESS_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
 
-					inputPorts[multiScope::FILL_COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->fillColor);
-					inputPorts[multiScope::FILL_OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->fillColor);
+					// inputPorts[multiScope::FILL_COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->fillColor);
+					// inputPorts[multiScope::FILL_OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->fillColor);
 					if (scopeModule->waveForms[wIx]->doFill)
 					{
 						fillColorLEDs[wIx]->setColor(scopeModule->waveForms[wIx]->fillColor);

@@ -27,7 +27,7 @@ struct TSSModuleWidgetBase : ModuleWidget {
 			}
 		}
 		if (module) {
-			module->randomize();
+			module->onRandomize();
 		}
 		return;
 	}

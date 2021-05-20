@@ -305,19 +305,19 @@ void multiScopeWidget::step() {
 		{
 			display[wIx]->box.size.x = width;
 			// Change light colors on plugs
-			if (plugLightsEnabled)
-			{
-				//if (scopeModule->waveForms[wIx]->colorChanged) // When reloading from save, this doesn't work :(
-				{
-					inputPorts[multiScope::PEN_ON_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::ROTATION_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::TIME_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::X_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-					inputPorts[multiScope::Y_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
-				}
-			}
+			// if (plugLightsEnabled)
+			// {
+			// 	//if (scopeModule->waveForms[wIx]->colorChanged) // When reloading from save, this doesn't work :(
+			// 	{
+			// 		inputPorts[multiScope::PEN_ON_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::OPACITY_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::COLOR_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::ROTATION_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::TIME_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::X_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 		inputPorts[multiScope::Y_INPUT + wIx]->setLightColor(scopeModule->waveForms[wIx]->waveColor);
+			// 	}
+			// }
 			// Adjusting Knobs ///////////////////////////////////////////////
 			// Link X, Y scales
 			int srcIx = -1;

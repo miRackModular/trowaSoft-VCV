@@ -11,12 +11,6 @@
 TSParamTextField::TSParamTextField(TextType textType, int maxLength, ParamWidget* paramCtl, const char* formatStr) : TSTextField(textType, maxLength)
 {
 	this->control = paramCtl;
-	FramebufferWidget* fbw = dynamic_cast<FramebufferWidget*>(paramCtl);
-	if (fbw != NULL)
-	{
-		isDirty = &(fbw->dirty);
-		isBufferedCtrl = true;
-	}
 	this->formatString = formatStr;
 	return;
 }
@@ -27,7 +21,6 @@ TSParamTextField::TSParamTextField(TextType textType, int maxLength, ParamWidget
 //-----------------------------------------------------------------------------------------------
 void TSParamTextField::saveValue()
 {
-	isEditing = 2; // Wait 2 cycles before setting knob -> text again in step()
 	char buffer[50] = { 0 };
 	if (control != NULL)
 	{
@@ -50,10 +43,6 @@ void TSParamTextField::saveValue()
 				controlVal = control->maxValue;
 			}
 			control->setValue(controlVal);
-			if (isBufferedCtrl && isDirty != NULL)
-			{
-				*isDirty = true; // Set dirty flag to redraw
-			}
 		}
 		lastControlVal = controlVal;
 		if (knob2TextVal != NULL)
@@ -61,24 +50,11 @@ void TSParamTextField::saveValue()
 		else
 			sprintf(buffer, formatString, controlVal);
 		text = buffer;
+		dirty = true;		
 	}
 	return;
 }
 
-//-----------------------------------------------------------------------------------------------
-// onAction()
-// Save value if valid.
-//-----------------------------------------------------------------------------------------------
-void TSParamTextField::onAction(EventAction &e)
-{
-	//debug("onAction() - visible = %d!", visible);
-	if (visible)
-	{
-		saveValue();
-		e.consumed = true;
-	}
-	return;
-}
 //-----------------------------------------------------------------------------------------------
 // onDefocus()
 // Validate input, set control value to match, format the text field number.
@@ -87,11 +63,11 @@ void TSParamTextField::onDefocus(EventDefocus &e)
 {
 	saveValue();
 	if (autoHideMode == AutoHideMode::AutoHideOnDefocus) {
-		visible = false;
+		// visible = false;
 	}
-	isEditing = 2; // Wait one cycle before setting knob -> text again in step()
+	isEditing = 0;
 	e.consumed = true;
-	return; 
+	TextField::onDefocus(e);
 } // end onDefocus()
 //-----------------------------------------------------------------------------------------------
 // step()
@@ -112,10 +88,9 @@ void TSParamTextField::step()
 			text = buffer;
 
 			lastControlVal = control->value;
+			dirty = true;
 		}
 	}
-	else if (isEditing < 3 && isEditing > 0)
-		isEditing--;
 	return;
 }
 //-----------------------------------------------------------------------------------------------
@@ -141,5 +116,6 @@ void TSParamTextField::setText(float val)
 	// Format the text
 	sprintf(buffer, formatString, val);
 	text = buffer;
+	dirty = true;
 	return;
 }

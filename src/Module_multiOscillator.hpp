@@ -471,12 +471,12 @@ struct multiOscillator : Module {
 	// reset(void)
 	// Initialize values.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	void reset() override;
+	void onReset() override;
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// randomize(void)
 	// Randomize button stuff.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	void randomize() override
+	void onRandomize() override
 	{
 		for (int i = 0; i < numberOscillators; i++)
 		{

@@ -7,7 +7,7 @@ using namespace rack;
 #include "trowaSoftComponents.hpp"
 #include "trowaSoftUtilities.hpp"
 #include "TSSequencerModuleBase.hpp"
-#include "TSOSCConfigWidget.hpp"
+// #include "TSOSCConfigWidget.hpp"
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // TSSequencerWidgetBase() - Base constructor.
@@ -44,18 +44,18 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 	// OSC configuration screen.
 	// Should be a popup but J just wants it of the screen.
 	////////////////////////////////////
-	if (!isPreview)
-	{
-		TSOSCConfigWidget* oscConfig = new TSOSCConfigWidget(thisModule, TSSequencerModuleBase::ParamIds::OSC_SAVE_CONF_PARAM, TSSequencerModuleBase::ParamIds::OSC_AUTO_RECONNECT_PARAM,
-			thisModule->oscCurrentClient,
-			thisModule->currentOSCSettings.oscTxIpAddress.c_str(), thisModule->currentOSCSettings.oscTxPort, thisModule->currentOSCSettings.oscRxPort);
-		oscConfig->setVisible(false);
-		oscConfig->box.pos = display->box.pos;
-		oscConfig->box.size = display->box.size;
-		//oscConfig->module = thisModule;
-		this->oscConfigurationScreen = oscConfig;
-		addChild(oscConfig);
-	}
+	// if (!isPreview)
+	// {
+	// 	TSOSCConfigWidget* oscConfig = new TSOSCConfigWidget(thisModule, TSSequencerModuleBase::ParamIds::OSC_SAVE_CONF_PARAM, TSSequencerModuleBase::ParamIds::OSC_AUTO_RECONNECT_PARAM,
+	// 		thisModule->oscCurrentClient,
+	// 		thisModule->currentOSCSettings.oscTxIpAddress.c_str(), thisModule->currentOSCSettings.oscTxPort, thisModule->currentOSCSettings.oscRxPort);
+	// 	oscConfig->setVisible(false);
+	// 	oscConfig->box.pos = display->box.pos;
+	// 	oscConfig->box.size = display->box.size;
+	// 	//oscConfig->module = thisModule;
+	// 	this->oscConfigurationScreen = oscConfig;
+	// 	addChild(oscConfig);
+	// }
 
 	////////////////////////////////////
 	// Labels
@@ -156,15 +156,15 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 	LEDButton* btn;
 	int y = knobRow;
 	int x = knobStart + (knobSpacing * 3) + dx; // 30
-	if (isPreview || thisModule->allowOSC)
-	{
-		Vec btnSize = Vec(ledSize.x - 2, ledSize.y - 2);
-		btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(x, y), module, TSSequencerModuleBase::ParamIds::OSC_SHOW_CONF_PARAM, 0, 1, 0));
-		btn->box.size = btnSize;
-		addParam(btn);
-		addChild(TS_createColorValueLight<ColorValueLight>(Vec(x, y), module, TSSequencerModuleBase::LightIds::OSC_CONFIGURE_LIGHT, ledSize, COLOR_WHITE));
-		addChild(TS_createColorValueLight<ColorValueLight>(Vec(x + 2, y + 2), module, TSSequencerModuleBase::LightIds::OSC_ENABLED_LIGHT, Vec(ledSize.x - 4, ledSize.y - 4), TSOSC_STATUS_COLOR));
-	}
+	// if (isPreview || thisModule->allowOSC)
+	// {
+	// 	Vec btnSize = Vec(ledSize.x - 2, ledSize.y - 2);
+	// 	btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(x, y), module, TSSequencerModuleBase::ParamIds::OSC_SHOW_CONF_PARAM, 0, 1, 0));
+	// 	btn->box.size = btnSize;
+	// 	addParam(btn);
+	// 	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x, y), module, TSSequencerModuleBase::LightIds::OSC_CONFIGURE_LIGHT, ledSize, COLOR_WHITE));
+	// 	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x + 2, y + 2), module, TSSequencerModuleBase::LightIds::OSC_ENABLED_LIGHT, Vec(ledSize.x - 4, ledSize.y - 4), TSOSC_STATUS_COLOR));
+	// }
 
 	ColorValueLight* lightPtr = NULL;
 
@@ -172,7 +172,7 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 	btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(knobStart + (knobSpacing * 4) + dx, knobRow), module, TSSequencerModuleBase::ParamIds::COPY_PATTERN_PARAM, 0, 1, 0));
 	btn->box.size = ledSize;
 	addParam(btn);
-	lightPtr = dynamic_cast<ColorValueLight*>(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 4) + dx, knobRow), module, TSSequencerModuleBase::LightIds::COPY_PATTERN_LIGHT, ledSize, COLOR_WHITE));
+	lightPtr = dynamic_cast<ColorValueLight*>(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 4) + dx + 1.6, knobRow + 1.6), module, TSSequencerModuleBase::LightIds::COPY_PATTERN_LIGHT, ledSize, COLOR_WHITE));
 	if (!isPreview)
 		thisModule->copyPatternLight = lightPtr;
 	addChild(lightPtr);
@@ -181,7 +181,7 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 	btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(knobStart + (knobSpacing * 5) + dx, knobRow), module, TSSequencerModuleBase::ParamIds::COPY_CHANNEL_PARAM, 0, 1, 0));
 	btn->box.size = ledSize;
 	addParam(btn);
-	lightPtr = dynamic_cast<ColorValueLight*>(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 5) + dx, knobRow), module, TSSequencerModuleBase::LightIds::COPY_CHANNEL_LIGHT, ledSize, COLOR_WHITE));
+	lightPtr = dynamic_cast<ColorValueLight*>(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 5) + dx + 1.6, knobRow + 1.6), module, TSSequencerModuleBase::LightIds::COPY_CHANNEL_LIGHT, ledSize, COLOR_WHITE));
 	if (!isPreview)
 		thisModule->copyGateLight = lightPtr;
 	addChild(lightPtr);
@@ -191,7 +191,7 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 	btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(knobStart + (knobSpacing * 1) + dx, knobRow), module, TSSequencerModuleBase::ParamIds::SELECTED_BPM_MULT_IX_PARAM, 0, 1, 0));
 	btn->box.size = ledSize;
 	addParam(btn);
-	addChild(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 1) + dx, knobRow), module, TSSequencerModuleBase::LightIds::SELECTED_BPM_MULT_IX_LIGHT, ledSize, COLOR_WHITE));
+	addChild(TS_createColorValueLight<ColorValueLight>(Vec(knobStart + (knobSpacing * 1) + dx + 1.6, knobRow + 1.6), module, TSSequencerModuleBase::LightIds::SELECTED_BPM_MULT_IX_LIGHT, ledSize, COLOR_WHITE));
 	
 	// Input Jacks:
 	int xStart = 10;
@@ -267,137 +267,137 @@ void TSSequencerWidgetBase::addBaseControls(bool addGridLines)
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // step(void)
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-void TSSequencerWidgetBase::step()
-{
-	if (this->module == NULL)
-		return;
+// void TSSequencerWidgetBase::step()
+// {
+// 	if (this->module == NULL)
+// 		return;
 
-	TSSequencerModuleBase* thisModule = dynamic_cast<TSSequencerModuleBase*>(module);
+// 	TSSequencerModuleBase* thisModule = dynamic_cast<TSSequencerModuleBase*>(module);
 
-	if (thisModule->oscConfigTrigger.process(thisModule->params[TSSequencerModuleBase::ParamIds::OSC_SHOW_CONF_PARAM].value))
-	{
-		thisModule->oscShowConfigurationScreen = !thisModule->oscShowConfigurationScreen;
-		thisModule->lights[TSSequencerModuleBase::LightIds::OSC_CONFIGURE_LIGHT].value = (thisModule->oscShowConfigurationScreen) ? 1.0 : 0.0;
-		this->oscConfigurationScreen->setVisible(thisModule->oscShowConfigurationScreen);
-		this->display->showDisplay = !thisModule->oscShowConfigurationScreen;
-		if (thisModule->oscShowConfigurationScreen)
-		{
-			if (!thisModule->oscInitialized)
-			{
-				// Make sure the ports are available
-				int p = TSOSCConnector::PortInUse(thisModule->currentOSCSettings.oscTxPort);
-				if (p > 0 && p != thisModule->oscId)
-					thisModule->currentOSCSettings.oscTxPort = TSOSCConnector::GetAvailablePort(thisModule->oscId, thisModule->currentOSCSettings.oscTxPort);
-				p = TSOSCConnector::PortInUse(thisModule->currentOSCSettings.oscRxPort);
-				if (p > 0 && p != thisModule->oscId)
-					thisModule->currentOSCSettings.oscRxPort = TSOSCConnector::GetAvailablePort(thisModule->oscId, thisModule->currentOSCSettings.oscRxPort);
+// 	if (thisModule->oscConfigTrigger.process(thisModule->params[TSSequencerModuleBase::ParamIds::OSC_SHOW_CONF_PARAM].value))
+// 	{
+// 		thisModule->oscShowConfigurationScreen = !thisModule->oscShowConfigurationScreen;
+// 		thisModule->lights[TSSequencerModuleBase::LightIds::OSC_CONFIGURE_LIGHT].value = (thisModule->oscShowConfigurationScreen) ? 1.0 : 0.0;
+// 		this->oscConfigurationScreen->setVisible(thisModule->oscShowConfigurationScreen);
+// 		this->display->showDisplay = !thisModule->oscShowConfigurationScreen;
+// 		if (thisModule->oscShowConfigurationScreen)
+// 		{
+// 			if (!thisModule->oscInitialized)
+// 			{
+// 				// Make sure the ports are available
+// 				int p = TSOSCConnector::PortInUse(thisModule->currentOSCSettings.oscTxPort);
+// 				if (p > 0 && p != thisModule->oscId)
+// 					thisModule->currentOSCSettings.oscTxPort = TSOSCConnector::GetAvailablePort(thisModule->oscId, thisModule->currentOSCSettings.oscTxPort);
+// 				p = TSOSCConnector::PortInUse(thisModule->currentOSCSettings.oscRxPort);
+// 				if (p > 0 && p != thisModule->oscId)
+// 					thisModule->currentOSCSettings.oscRxPort = TSOSCConnector::GetAvailablePort(thisModule->oscId, thisModule->currentOSCSettings.oscRxPort);
 
-			}
-			this->oscConfigurationScreen->setValues(thisModule->currentOSCSettings.oscTxIpAddress, thisModule->currentOSCSettings.oscTxPort, thisModule->currentOSCSettings.oscRxPort);
-			this->oscConfigurationScreen->ckAutoReconnect->checked = thisModule->oscReconnectAtLoad;
-			this->oscConfigurationScreen->setSelectedClient(thisModule->oscCurrentClient); // OSC Client
-			this->oscConfigurationScreen->btnActionEnable = !thisModule->oscInitialized;
+// 			}
+// 			this->oscConfigurationScreen->setValues(thisModule->currentOSCSettings.oscTxIpAddress, thisModule->currentOSCSettings.oscTxPort, thisModule->currentOSCSettings.oscRxPort);
+// 			this->oscConfigurationScreen->ckAutoReconnect->checked = thisModule->oscReconnectAtLoad;
+// 			this->oscConfigurationScreen->setSelectedClient(thisModule->oscCurrentClient); // OSC Client
+// 			this->oscConfigurationScreen->btnActionEnable = !thisModule->oscInitialized;
 
-			this->oscConfigurationScreen->errorMsg = "";
-			if (thisModule->oscError)
-			{
-				this->oscConfigurationScreen->errorMsg = "Error connecting to " + thisModule->currentOSCSettings.oscTxIpAddress;
-			}
-			this->oscConfigurationScreen->setVisible(true);
-		}
-		else
-		{
-			this->oscConfigurationScreen->setVisible(false);
-		}
-	}
-	if (thisModule->oscShowConfigurationScreen)
-	{
-		// Check for enable/disable
-		if (thisModule->oscConnectTrigger.process(thisModule->params[TSSequencerModuleBase::ParamIds::OSC_SAVE_CONF_PARAM].value))
-		{
-			if (oscConfigurationScreen->btnActionEnable)
-			{
-				// Enable OSC ------------------------------------------------------------------------
-				// User checked to connect
-				if (!this->oscConfigurationScreen->isValidIpAddress())
-				{
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-					debug("IP Address is not valid.");
-#endif
-					this->oscConfigurationScreen->errorMsg = "Invalid IP Address.";
-					this->oscConfigurationScreen->tbIpAddress->requestFocus();
-				}
-				else if (!this->oscConfigurationScreen->isValidTxPort())
-				{
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-					debug("Tx Port is not valid.");
-#endif
-					this->oscConfigurationScreen->errorMsg = "Invalid Output Port (0-" + std::to_string(0xFFFF) + ").";
-					this->oscConfigurationScreen->tbTxPort->requestFocus();
+// 			this->oscConfigurationScreen->errorMsg = "";
+// 			if (thisModule->oscError)
+// 			{
+// 				this->oscConfigurationScreen->errorMsg = "Error connecting to " + thisModule->currentOSCSettings.oscTxIpAddress;
+// 			}
+// 			this->oscConfigurationScreen->setVisible(true);
+// 		}
+// 		else
+// 		{
+// 			this->oscConfigurationScreen->setVisible(false);
+// 		}
+// 	}
+// 	if (thisModule->oscShowConfigurationScreen)
+// 	{
+// 		// Check for enable/disable
+// 		if (thisModule->oscConnectTrigger.process(thisModule->params[TSSequencerModuleBase::ParamIds::OSC_SAVE_CONF_PARAM].value))
+// 		{
+// 			if (oscConfigurationScreen->btnActionEnable)
+// 			{
+// 				// Enable OSC ------------------------------------------------------------------------
+// 				// User checked to connect
+// 				if (!this->oscConfigurationScreen->isValidIpAddress())
+// 				{
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 					debug("IP Address is not valid.");
+// #endif
+// 					this->oscConfigurationScreen->errorMsg = "Invalid IP Address.";
+// 					this->oscConfigurationScreen->tbIpAddress->requestFocus();
+// 				}
+// 				else if (!this->oscConfigurationScreen->isValidTxPort())
+// 				{
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 					debug("Tx Port is not valid.");
+// #endif
+// 					this->oscConfigurationScreen->errorMsg = "Invalid Output Port (0-" + std::to_string(0xFFFF) + ").";
+// 					this->oscConfigurationScreen->tbTxPort->requestFocus();
 
-				}
-				else if (!this->oscConfigurationScreen->isValidRxPort())
-				{
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-					debug("Rx Port is not valid.");
-#endif
-					this->oscConfigurationScreen->errorMsg = "Invalid Input Port (0-" + std::to_string(0xFFFF) + ").";
-					this->oscConfigurationScreen->tbRxPort->requestFocus();
-				}
-				else
-				{
-					// Try to connect
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-					debug("Save OSC Configuration clicked, save information for module.");
-#endif
-					this->oscConfigurationScreen->errorMsg = "";
-					thisModule->oscNewSettings.oscTxIpAddress = this->oscConfigurationScreen->tbIpAddress->text.c_str();
-					thisModule->oscNewSettings.oscTxPort = this->oscConfigurationScreen->getTxPort();
-					thisModule->oscNewSettings.oscRxPort = this->oscConfigurationScreen->getRxPort(); 
-					thisModule->oscCurrentClient = this->oscConfigurationScreen->getSelectedClient();
-					thisModule->oscCurrentAction = TSSequencerModuleBase::OSCAction::Enable;
-					thisModule->oscReconnectAtLoad = this->oscConfigurationScreen->ckAutoReconnect->checked;
-				}
-			} // end if enable osc
-			else
-			{
-				// Disable OSC ------------------------------------------------------------------
-#if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
-				debug("Disable OSC clicked.");
-#endif
-				this->oscConfigurationScreen->errorMsg = "";
-				thisModule->oscCurrentAction = TSSequencerModuleBase::OSCAction::Disable;
-			} // end else disable OSC
-		} // end if OSC Save btn pressed
-		else
-		{
-			if (thisModule->oscError)
-			{
-				if (this->oscConfigurationScreen->errorMsg.empty())
-					this->oscConfigurationScreen->errorMsg = "Error connecting to " + thisModule->currentOSCSettings.oscTxIpAddress + ".";
-			}
-		}
-		// Current status of OSC
-		if (thisModule->useOSC && thisModule->oscInitialized)
-		{ // Now we have a checkbox up top where statusMsg used to be, so let's not use it for now.
-			//this->oscConfigurationScreen->statusMsg = OSCClientAbbr[thisModule->oscCurrentClient] + " " + thisModule->currentOSCSettings.oscTxIpAddress;
-			//this->oscConfigurationScreen->statusMsg2 = ":" + std::to_string(thisModule->currentOSCSettings.oscTxPort)
-			//	+ " :" + std::to_string(thisModule->currentOSCSettings.oscRxPort);
-			this->oscConfigurationScreen->statusMsg2 = OSCClientAbbr[thisModule->oscCurrentClient] + " " + thisModule->currentOSCSettings.oscTxIpAddress;
-			this->oscConfigurationScreen->btnActionEnable = false;
-		}
-		else
-		{
-			this->oscConfigurationScreen->successMsg = "";
-			this->oscConfigurationScreen->statusMsg = "";// "OSC Not Connected";
-			this->oscConfigurationScreen->statusMsg2 = "OSC Not Connected"; //"";
-			this->oscConfigurationScreen->btnActionEnable = true;
-		}
-	} // end if show OSC config screen
+// 				}
+// 				else if (!this->oscConfigurationScreen->isValidRxPort())
+// 				{
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 					debug("Rx Port is not valid.");
+// #endif
+// 					this->oscConfigurationScreen->errorMsg = "Invalid Input Port (0-" + std::to_string(0xFFFF) + ").";
+// 					this->oscConfigurationScreen->tbRxPort->requestFocus();
+// 				}
+// 				else
+// 				{
+// 					// Try to connect
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 					debug("Save OSC Configuration clicked, save information for module.");
+// #endif
+// 					this->oscConfigurationScreen->errorMsg = "";
+// 					thisModule->oscNewSettings.oscTxIpAddress = this->oscConfigurationScreen->tbIpAddress->text.c_str();
+// 					thisModule->oscNewSettings.oscTxPort = this->oscConfigurationScreen->getTxPort();
+// 					thisModule->oscNewSettings.oscRxPort = this->oscConfigurationScreen->getRxPort(); 
+// 					thisModule->oscCurrentClient = this->oscConfigurationScreen->getSelectedClient();
+// 					thisModule->oscCurrentAction = TSSequencerModuleBase::OSCAction::Enable;
+// 					thisModule->oscReconnectAtLoad = this->oscConfigurationScreen->ckAutoReconnect->checked;
+// 				}
+// 			} // end if enable osc
+// 			else
+// 			{
+// 				// Disable OSC ------------------------------------------------------------------
+// #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
+// 				debug("Disable OSC clicked.");
+// #endif
+// 				this->oscConfigurationScreen->errorMsg = "";
+// 				thisModule->oscCurrentAction = TSSequencerModuleBase::OSCAction::Disable;
+// 			} // end else disable OSC
+// 		} // end if OSC Save btn pressed
+// 		else
+// 		{
+// 			if (thisModule->oscError)
+// 			{
+// 				if (this->oscConfigurationScreen->errorMsg.empty())
+// 					this->oscConfigurationScreen->errorMsg = "Error connecting to " + thisModule->currentOSCSettings.oscTxIpAddress + ".";
+// 			}
+// 		}
+// 		// Current status of OSC
+// 		if (thisModule->useOSC && thisModule->oscInitialized)
+// 		{ // Now we have a checkbox up top where statusMsg used to be, so let's not use it for now.
+// 			//this->oscConfigurationScreen->statusMsg = OSCClientAbbr[thisModule->oscCurrentClient] + " " + thisModule->currentOSCSettings.oscTxIpAddress;
+// 			//this->oscConfigurationScreen->statusMsg2 = ":" + std::to_string(thisModule->currentOSCSettings.oscTxPort)
+// 			//	+ " :" + std::to_string(thisModule->currentOSCSettings.oscRxPort);
+// 			this->oscConfigurationScreen->statusMsg2 = OSCClientAbbr[thisModule->oscCurrentClient] + " " + thisModule->currentOSCSettings.oscTxIpAddress;
+// 			this->oscConfigurationScreen->btnActionEnable = false;
+// 		}
+// 		else
+// 		{
+// 			this->oscConfigurationScreen->successMsg = "";
+// 			this->oscConfigurationScreen->statusMsg = "";// "OSC Not Connected";
+// 			this->oscConfigurationScreen->statusMsg2 = "OSC Not Connected"; //"";
+// 			this->oscConfigurationScreen->btnActionEnable = true;
+// 		}
+// 	} // end if show OSC config screen
 
-	ModuleWidget::step();
-	return;
-} // end step()
+// 	ModuleWidget::step();
+// 	return;
+// } // end step()
 
 struct seqRandomSubMenuItem : MenuItem {
 	TSSequencerModuleBase* sequencerModule;

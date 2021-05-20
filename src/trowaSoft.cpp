@@ -9,6 +9,8 @@
 // The plugin-wide instance of the Plugin class
 Plugin *plugin;
 
+int _trowaGroupId;
+
 void init(rack::Plugin *p) {
 	plugin = p;
 	p->slug = TROWA_PLUGIN_NAME;

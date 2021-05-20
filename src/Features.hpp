@@ -2,6 +2,6 @@
 #define FEATURES_HPP
 
 // Scope is totally broken on MAC OS only. So use old scope for MAC.
-#define USE_NEW_SCOPE	(!(__APPLE__))
+#define USE_NEW_SCOPE	0 //(!(__APPLE__))
 
 #endif // FEATURES

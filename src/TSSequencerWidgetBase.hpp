@@ -5,7 +5,7 @@
 using namespace rack;
 
 #include "TSSModuleWidgetBase.hpp"
-#include "TSOSCConfigWidget.hpp"
+// #include "TSOSCConfigWidget.hpp"
 
 struct TSSeqDisplay;
 struct TSSequencerModuleBase;
@@ -18,7 +18,7 @@ struct TSSequencerWidgetBase : TSSModuleWidgetBase {
 	// Top digital display for sequencer.
 	TSSeqDisplay *display;
 	// OSC configuration widget.
-	TSOSCConfigWidget* oscConfigurationScreen;
+	// TSOSCConfigWidget* oscConfigurationScreen;
 	// Numer of steps this should have (for when we get a NULL module).
 	int maxSteps = 16;
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -28,7 +28,7 @@ struct TSSequencerWidgetBase : TSSModuleWidgetBase {
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	TSSequencerWidgetBase(TSSequencerModuleBase* seqModule);
 	// Step
-	void step() override;
+	// void step() override;
 	// Add base controls.
 	void addBaseControls() { addBaseControls(false); }
 	// Add base controls.

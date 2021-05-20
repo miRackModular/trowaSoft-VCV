@@ -76,7 +76,7 @@ void multiScope::step() {
 		//waveForm = waveForms[wIx]; // tmp pointer
 
 		// Effect:
-		waveForms[wIx]->gEffectIx = (int)clamp(static_cast<int>(roundf(params[multiScope::EFFECT_PARAM+wIx].value)), 0, TROWA_SCOPE_NUM_EFFECTS - 1);
+		// waveForms[wIx]->gEffectIx = (int)clamp(static_cast<int>(roundf(params[multiScope::EFFECT_PARAM+wIx].value)), 0, TROWA_SCOPE_NUM_EFFECTS - 1);
 
 		// Lissajous:
 		if (waveForms[wIx]->lissajousTrigger.process(params[multiScope::LISSAJOUS_PARAM + wIx].value))
@@ -484,7 +484,7 @@ void multiScopeDisplay::drawWaveform(NVGcontext *vg, float *valX, float *valY, b
 	nvgStroke(vg);
 	nvgResetScissor(vg);
 	nvgRestore(vg);
-	nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER); // Restore to normal
+	// nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER); // Restore to normal
 	return;
 } // end drawWaveform()	  
 

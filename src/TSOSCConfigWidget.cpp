@@ -225,20 +225,20 @@ void TSOSCConfigWidget::step() {
 // Callback for tabbing between our text boxes.
 void TSOSCConfigWidget::onTabField(int id)
 {
-	int focusIx = (id + 1) % 3;
-	textBoxes[focusIx]->requestFocus();
-	return;
+	// int focusIx = (id + 1) % 3;
+	// textBoxes[focusIx]->requestFocus();
+	// return;
 }
 
 // Callback for shift-tabbing between our text boxes.
 // This doesn't work since in C++ I can't figure out how to get a damn pointer to a member function...
 void TSOSCConfigWidget::onShiftTabField(int id)
 {
-	int focusIx = id - 1;
-	if (focusIx < 0)
-		focusIx = 2;
-	textBoxes[focusIx]->requestFocus();
-	return;
+	// int focusIx = id - 1;
+	// if (focusIx < 0)
+		// focusIx = 2;
+	// textBoxes[focusIx]->requestFocus();
+	// return;
 }
 
 void TSOSCConfigWidget::draw(NVGcontext *vg) {

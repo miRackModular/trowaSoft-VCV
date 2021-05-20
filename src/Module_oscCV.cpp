@@ -73,7 +73,7 @@ oscCV::~oscCV()
 // reset(void)
 // Initialize values.
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-void oscCV::reset() {
+void oscCV::onReset() {
 	// Stop OSC while we reset the values
 	cleanupOSC();
 
@@ -81,12 +81,12 @@ void oscCV::reset() {
 	this->oscReconnectAtLoad = false;
 
 	// Reset our values
-	oscMutex.lock();
+	// oscMutex.lock();
 	initialChannels();
 	this->currentOSCSettings.oscTxIpAddress = OSC_ADDRESS_DEF;
 	this->currentOSCSettings.oscTxPort = OSC_OUTPORT_DEF;
 	this->currentOSCSettings.oscRxPort = OSC_INPORT_DEF;
-	oscMutex.unlock();
+	// oscMutex.unlock();
 
 	this->oscShowConfigurationScreen = false;
 
@@ -103,7 +103,7 @@ void oscCV::reset() {
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 void oscCV::initOSC(const char* ipAddress, int outputPort, int inputPort)
 {
-	oscMutex.lock();
+	// oscMutex.lock();
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_LOW
 	debug("oscCV::initOSC() - Initializing OSC");
 #endif
@@ -181,7 +181,7 @@ void oscCV::initOSC(const char* ipAddress, int outputPort, int inputPort)
 		warn("oscCV::initOSC() - Error initializing: %s.", ex.what());
 #endif
 	}
-	oscMutex.unlock();
+	// oscMutex.unlock();
 	return;
 }
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -189,7 +189,7 @@ void oscCV::initOSC(const char* ipAddress, int outputPort, int inputPort)
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 void oscCV::cleanupOSC() 
 {
-	oscMutex.lock();
+	// oscMutex.lock();
 	try
 	{
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_LOW
@@ -230,7 +230,7 @@ void oscCV::cleanupOSC()
 		debug("oscCV::cleanupOSC() - Exception caught:\n%s", ex.what());
 #endif
 	}
-	oscMutex.unlock();
+	// oscMutex.unlock();
 } // end cleanupOSC()
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -425,7 +425,7 @@ void oscCV::step()
 				if (sendVal)
 				{
 					lights[LightIds::CH_LIGHT_START + c * TROWA_OSCCV_NUM_LIGHTS_PER_CHANNEL].value = 1.0f;
-					oscMutex.lock();
+					// oscMutex.lock();
 					try
 					{
 						if (!packetOpened)
@@ -476,7 +476,7 @@ void oscCV::step()
 					{
 						warn("Error %s.", e.what());
 					}
-					oscMutex.unlock();
+					// oscMutex.unlock();
 					// Save our last sent values
 					//inputChannels[c].lastTranslatedVal = inputChannels[c].translatedVal;
 					inputChannels[c].lastTranslatedVal = outVal;
@@ -491,7 +491,7 @@ void oscCV::step()
 		} // end for loop
 		if (packetOpened)
 		{
-			oscMutex.lock();
+			// oscMutex.lock();
 			try
 			{
 				oscStream << osc::EndBundle;
@@ -501,7 +501,7 @@ void oscCV::step()
 			{
 				warn("Error %s.", e.what());
 			}
-			oscMutex.unlock();
+			// oscMutex.unlock();
 		} // end if packet opened (close it)
 		
 	} // end Rack Input Ports ==> OSC Output
@@ -514,10 +514,11 @@ void oscCV::step()
 		//------------------------------------------------------------
 		// Look for OSC Rx messages --> Output to Rack
 		//------------------------------------------------------------
-		while (rxMsgQueue.size() > 0)
+		TSOSCCVSimpleMessage rxOscMsg;
+		while (rxMsgQueue.try_dequeue(rxOscMsg))
 		{
-			TSOSCCVSimpleMessage rxOscMsg = rxMsgQueue.front();
-			rxMsgQueue.pop();
+			// TSOSCCVSimpleMessage rxOscMsg = rxMsgQueue.front();
+			// rxMsgQueue.pop();
 
 			int chIx = rxOscMsg.channelNum - 1;
 			if (chIx > -1 && chIx < numberChannels)
@@ -555,7 +556,7 @@ void oscCV::step()
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 void oscCV::setOscNamespace(std::string oscNs)
 {
-	std::lock_guard<std::mutex> lock(oscMutex);
+	// std::lock_guard<std::mutex> lock(oscMutex);
 	if (!oscNs.empty() && oscNs.at(0) == '/')
 		this->oscNamespace = oscNs.substr(1);
 	else
@@ -672,27 +673,27 @@ void TSOSCCVSimpleMsgListener::ProcessMessage(const osc::ReceivedMessage& rxMsg,
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
 						debug("OSC Recv Ch %d: Bool %d at %s.", c+1, boolArg, oscModule->outputChannels[c].path.c_str());
 #endif
-						oscModule->rxMsgQueue.push(TSOSCCVSimpleMessage(c + 1, boolArg));
+						oscModule->rxMsgQueue.enqueue(TSOSCCVSimpleMessage(c + 1, boolArg));
 						break;
 					case TSOSCCVChannel::ArgDataType::OscInt:
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
 						debug("OSC Recv Ch %d: Int %d at %s.", c + 1, intArg, oscModule->outputChannels[c].path.c_str());
 #endif
-						oscModule->rxMsgQueue.push(TSOSCCVSimpleMessage(c + 1, intArg));
+						oscModule->rxMsgQueue.enqueue(TSOSCCVSimpleMessage(c + 1, intArg));
 						break;
 					case TSOSCCVChannel::ArgDataType::OscMidi:
 						// Actually, I don't think anything natively supports this, so this would be unused.
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
 						debug("OSC Recv Ch %d: MIDI %08x at %s.", c + 1, uintArg, oscModule->outputChannels[c].path.c_str());
 #endif
-						oscModule->rxMsgQueue.push(TSOSCCVSimpleMessage(c + 1, floatArg, uintArg));
+						oscModule->rxMsgQueue.enqueue(TSOSCCVSimpleMessage(c + 1, floatArg, uintArg));
 						break;
 					case TSOSCCVChannel::ArgDataType::OscFloat:
 					default:
 #if TROWA_DEBUG_MSGS >= TROWA_DEBUG_LVL_MED
 						debug("OSC Recv Ch %d: Float %7.4f at %s.", c + 1, floatArg, oscModule->outputChannels[c].path.c_str());
 #endif
-						oscModule->rxMsgQueue.push(TSOSCCVSimpleMessage(c + 1, floatArg));
+						oscModule->rxMsgQueue.enqueue(TSOSCCVSimpleMessage(c + 1, floatArg));
 						break;
 				} // end switch
 			} // end if path matches

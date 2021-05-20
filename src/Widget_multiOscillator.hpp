@@ -121,43 +121,6 @@ struct TSSingleOscillatorDisplay : TransparentWidget
 	// @vg : (IN) NVGcontext to draw on
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	void draw(/*in*/ NVGcontext *vg) override;
-
-	/**
-	Called when a mouse button is pressed over this widget
-	0 for left, 1 for right, 2 for middle.
-	Return `this` to accept the event.
-	Return NULL to reject the event and pass it to the widget behind this one.
-	*/
-	void onMouseDown(EventMouseDown &e) override {
-		if (showDisplay) {
-			if (e.button == 0)
-			{
-				// Left click, check position, find which text box this would go to.
-				int txtBoxIx = -1;
-				const int padding = 5;
-				float dx = (box.size.x - padding * 2) / numTextBoxes;
-				float x1 = padding;
-				int i = 0;
-				while (i < numTextBoxes && txtBoxIx < 0)
-				{
-					float x2 = x1 + dx;
-					if (e.pos.x >= x1 && e.pos.x < x2) {
-						txtBoxIx = i;
-					}
-					x1 += dx;
-					i++;
-				}
-				if (txtBoxIx > -1 && !textBoxes[txtBoxIx]->visible)
-				{
-					// Show the text box:
-					textBoxes[txtBoxIx]->visible = true;
-					e.target = textBoxes[txtBoxIx];
-					e.consumed = true;
-				}
-			} // end if left click
-		} // end if visible
-		return;
-	} // end onMouseDown()
 };
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -204,7 +167,7 @@ struct TSSingleOscillatorWidget : Widget
 	// @osc : (IN) Pointer to the oscillator this widget represents.
 	// @num : (IN) The oscillator number.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	TSSingleOscillatorWidget(multiOscillatorWidget* parentWidget, TS_Oscillator* osc, int num);
+	TSSingleOscillatorWidget(multiOscillatorWidget* parentWidget, TS_Oscillator* osc, int num, Vec location);
 
 	~TSSingleOscillatorWidget()
 	{
@@ -271,15 +234,6 @@ struct TSOscillatorChannelDisplayWidget : TransparentWidget
 	// @vg : (IN) NVGcontext to draw on
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	void draw(/*in*/ NVGcontext *vg) override;
-
-	/**
-	Called when a mouse button is pressed over this widget
-	0 for left, 1 for right, 2 for middle.
-	Return `this` to accept the event.
-	Return NULL to reject the event and pass it to the widget behind this one.
-	*/
-	void onMouseDown(EventMouseDown &e) override;
-
 };
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
@@ -327,10 +281,8 @@ struct TSOscillatorChannelWidget : VirtualWidget
 
 	void step() override
 	{
-		// AUX:
-		tbParamValues[0]->canTabToThisEnabled = (oscillatorOutput->waveFormType == WaveFormType::WAVEFORM_SQR);
+		tbParamValues[0]->enabled = (oscillatorOutput->waveFormType == WaveFormType::WAVEFORM_SQR);
 		VirtualWidget::step();
-		return;
 	}
 
 };

@@ -91,8 +91,7 @@ multiOscillatorWidget::multiOscillatorWidget(multiOscillator* thisModule) : TSSM
 	TSParamTextField* lastTb = NULL;
 	for (int i = 0; i < numberOscillators; i++)
 	{
-		TSSingleOscillatorWidget* oscillatorWidget = new TSSingleOscillatorWidget(this, &(oscillators[i]), i + 1);
-		oscillatorWidget->box.pos = Vec(x, y);
+		TSSingleOscillatorWidget* oscillatorWidget = new TSSingleOscillatorWidget(this, &(oscillators[i]), i + 1, Vec(x, y));
 		oscillatorWidget->box.size.x = box.size.x;
 		addChild(oscillatorWidget);
 		y += OSC_WIDGET_HEIGHT;
@@ -202,7 +201,7 @@ void TSSingleOscillatorDisplay::draw(/*in*/ NVGcontext *vg) {
 	{
 		nvgFillColor(vg, textColor); // Value is white
 		std::string label = std::string(labels[i]);
-		if (!this->textBoxes[i]->visible) // If the text box is visible, then don't draw the values.
+		if (!this->textBoxes[i]->isEditing) // If the text box is visible, then don't draw the values.
 		{
 			// Large Font:
 			nvgFontSize(vg, largeFontSize);
@@ -247,8 +246,10 @@ void TSSingleOscillatorDisplay::draw(/*in*/ NVGcontext *vg) {
 // @osc : (IN) Pointer to the oscillator this widget represents.
 // @num : (IN) The oscillator number.
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-TSSingleOscillatorWidget::TSSingleOscillatorWidget(multiOscillatorWidget* parentWidget, TS_Oscillator* osc, int num)
+TSSingleOscillatorWidget::TSSingleOscillatorWidget(multiOscillatorWidget* parentWidget, TS_Oscillator* osc, int num, Vec location)
 {
+	canSquash = true;
+	box.pos = location;
 	box.size = Vec(OSC_WIDGET_WIDTH, OSC_WIDGET_HEIGHT);
 	multiOscillator* thisModule = dynamic_cast<multiOscillator*>(parentWidget->module);
 	this->oscillator = osc;
@@ -334,7 +335,6 @@ TSSingleOscillatorWidget::TSSingleOscillatorWidget(multiOscillatorWidget* parent
 		knobTextBox->box.pos = Vec(screenStartX + 15 + paramId*88.75, y + tbDy);
 		knobTextBox->box.size = tbSize;
 		knobTextBox->borderColor = mainColor;
-		knobTextBox->visible = false;
 		knobTextBox->tabNextHiddenAction = TSTextField::TabFieldHiddenAction::ShowHiddenTabToField;
 		knobTextBox->autoHideMode = TSParamTextField::AutoHideMode::AutoHideOnDefocus;
 		addChild(knobTextBox);
@@ -429,6 +429,7 @@ TSSingleOscillatorWidget::TSSingleOscillatorWidget(multiOscillatorWidget* parent
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 void TSSingleOscillatorWidget::draw(/*in*/ NVGcontext *vg)
 {
+	nvgSave(vg);
 	// Draw screen background
 	// Background Colors:
 	NVGcolor backgroundColor = nvgRGB(0x20, 0x20, 0x20);
@@ -441,57 +442,11 @@ void TSSingleOscillatorWidget::draw(/*in*/ NVGcontext *vg)
 	nvgStrokeWidth(vg, 1.0);
 	nvgStrokeColor(vg, borderColor);
 	nvgStroke(vg);
+	nvgRestore(vg);
 
 	Widget::draw(vg);
 	return;
 } // end TSSingleOscillatorWidget::draw()
-
-
-/**
-Called when a mouse button is pressed over this widget
-0 for left, 1 for right, 2 for middle.
-Return `this` to accept the event.
-Return NULL to reject the event and pass it to the widget behind this one.
-*/
-void TSOscillatorChannelDisplayWidget::onMouseDown(EventMouseDown &e) {
-	if (showDisplay) {
-		if (e.button == 0 && e.pos.y >= yTbStart && e.pos.y < yTbEnd)
-		{
-			// Left click, check position, find which text box this would go to.
-			int txtBoxIx = -1;
-			const int padding = 5;
-			float dx = (box.size.x - padding * 2) / numFields;
-			float x1 = padding;
-			int i = 0;
-			while (i < numFields && txtBoxIx < 0)
-			{
-				float x2 = x1 + dx;
-				if (e.pos.x >= x1 && e.pos.x < x2 && hasTextBox[i]) {
-					if (i == 1)
-					{
-						// For now, only show textbox on P.Width
-						if (parentWidget->oscillatorOutput->waveFormType == WaveFormType::WAVEFORM_SQR)
-							txtBoxIx = i;
-					}
-					else
-					{
-						txtBoxIx = i;
-					}
-				}
-				x1 += dx;
-				i++;
-			}
-			if (txtBoxIx > -1 && !textBoxes[txtBoxIx]->visible)
-			{
-				// Show the text box:
-				textBoxes[txtBoxIx]->visible = true;
-				e.target = textBoxes[txtBoxIx];
-				e.consumed = true;
-			}
-		} // end if left click
-	} // end if visible
-	return;
-} // end TSOscillatorChannelDisplayWidget::onMouseDown()
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 // draw()
@@ -544,7 +499,7 @@ void TSOscillatorChannelDisplayWidget::draw(/*in*/ NVGcontext *vg)
 		nvgTextLetterSpacing(vg, largeSpacing);
 		if (hasTextBox[i] && (i != 1)) 
 		{
-			if (!this->textBoxes[i]->visible) // If the text box is visible, then don't draw the values.
+			if (!this->textBoxes[i]->isEditing) // If the text box is visible, then don't draw the values.
 			{
 				// Show value
 				float val = std::stof(this->textBoxes[i]->text, NULL);
@@ -707,7 +662,6 @@ TSOscillatorChannelWidget::TSOscillatorChannelWidget(multiOscillatorWidget* pare
 			knobTextBox->box.pos = Vec(parentOscWidget->screenStartX + 15 + paramId * 88.75, y + tbDy);
 			knobTextBox->box.size = tbSize;
 			knobTextBox->borderColor = mainColor;
-			knobTextBox->visible = false;
 			knobTextBox->tabNextHiddenAction = TSTextField::TabFieldHiddenAction::ShowHiddenTabToField;
 			knobTextBox->autoHideMode = TSParamTextField::AutoHideMode::AutoHideOnDefocus;
 			addChild(knobTextBox);
@@ -749,9 +703,9 @@ TSOscillatorChannelWidget::TSOscillatorChannelWidget(multiOscillatorWidget* pare
 	btn->box.size = ledBtnSize;
 	addChild(btn);
 	parentModuleWidget->params.push_back(btn);
-	ColorValueLight* light = TS_createColorValueLight<ColorValueLight>(Vec(x + 3, y + 14), thisModule,
+	ColorValueLight* light = TS_createColorValueLight<ColorValueLight>(Vec(x + 3.6, y + 14.6).plus(parentOscWidget->box.pos).plus(location), thisModule,
 		baseLightId + TS_OscillatorOutput::BaseLightIds::OUT_AM_MODE_LED, ledSize, COLOR_WHITE);
-	addChild(light);
+	parentModuleWidget->addChild(light);
 
 
 	//------------------------------------------

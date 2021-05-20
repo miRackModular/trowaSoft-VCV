@@ -23,10 +23,10 @@ using namespace rack;
 #include "TSOSCSequencerOutputMessages.hpp"
 #include "TSSequencerWidgetBase.hpp"
 
-#include "../lib/oscpack/osc/OscOutboundPacketStream.h"
-#include "../lib/oscpack/ip/UdpSocket.h"
-#include "../lib/oscpack/osc/OscReceivedElements.h"
-#include "../lib/oscpack/osc/OscPacketListener.h"
+// #include "../lib/oscpack/osc/OscOutboundPacketStream.h"
+// #include "../lib/oscpack/ip/UdpSocket.h"
+// #include "../lib/oscpack/osc/OscReceivedElements.h"
+// #include "../lib/oscpack/osc/OscPacketListener.h"
 
 #define TROWA_SEQ_NUM_CHNLS		16	// Num of channels/triggers/voices
 #define TROWA_SEQ_NUM_STEPS		16  // Num of steps per gate/voice
@@ -102,9 +102,9 @@ struct TSSequencerModuleBase : Module {
 		COPY_CHANNEL_PARAM, // Copy the current Channel/gate/trigger in the current Pattern only.
 		PASTE_PARAM, // Paste what is on our clip board to the now current editing.
 		SELECTED_BPM_MULT_IX_PARAM, // Selected index into our BPM calculation multipliers (for 1/4, 1/8, 1/8T, 1/16 note calcs)
-		OSC_SAVE_CONF_PARAM, // ENABLE and Save the configuration for OSC
-		OSC_AUTO_RECONNECT_PARAM,   // Auto-reconnect OSC on load from save file.
-		OSC_SHOW_CONF_PARAM, // Configure OSC toggle
+		// OSC_SAVE_CONF_PARAM, // ENABLE and Save the configuration for OSC
+		// OSC_AUTO_RECONNECT_PARAM,   // Auto-reconnect OSC on load from save file.
+		// OSC_SHOW_CONF_PARAM, // Configure OSC toggle
 		CHANNEL_PARAM, // Edit Channel/Step Buttons/Knobs
 		NUM_PARAMS = CHANNEL_PARAM // Add the number of steps separately...
 	};
@@ -131,8 +131,8 @@ struct TSSequencerModuleBase : Module {
 		COPY_CHANNEL_LIGHT, // Copy channel
 		PASTE_LIGHT,	// Paste light
 		SELECTED_BPM_MULT_IX_LIGHT,	// BPM multiplier/note index
-		OSC_CONFIGURE_LIGHT, // The light for configuring OSC.
-		OSC_ENABLED_LIGHT, // Light for OSC enabled and currently running/active.
+		// OSC_CONFIGURE_LIGHT, // The light for configuring OSC.
+		// OSC_ENABLED_LIGHT, // Light for OSC enabled and currently running/active.
 		CHANNEL_LIGHTS, // Channel output lights.		
 		PAD_LIGHTS = CHANNEL_LIGHTS + TROWA_SEQ_NUM_CHNLS, // Lights for the steps/pads for the currently editing Channel
 														   // Not the number of lights yet, add the # of steps (maxSteps)
@@ -295,9 +295,9 @@ struct TSSequencerModuleBase : Module {
 	int selectedBPMNoteIx = 1; // 1/8th
 	SchmittTrigger selectedBPMNoteTrigger;
 
-	// External Messages ///////////////////////////////////////////////
-	// Message queue for external (to Rack) control messages
-	std::queue<TSExternalControlMessage> ctlMsgQueue;
+	// // External Messages ///////////////////////////////////////////////
+	// // Message queue for external (to Rack) control messages
+	// std::queue<TSExternalControlMessage> ctlMsgQueue;
 
 	enum ExternalControllerMode {
 		// Edit Mode : Send to control what we are editing.
@@ -314,52 +314,52 @@ struct TSSequencerModuleBase : Module {
 	bool allowOSC = true;
 	// Flag if we should use OSC or not.
 	bool useOSC = true;
-	// An OSC id.
-	int oscId = 0;
-	// Mutex for osc messaging.
+	// // An OSC id.
+	// int oscId = 0;
+	// // Mutex for osc messaging.
 	std::mutex oscMutex;
-	// Current OSC IP address and port settings.
-	TSOSCConnectionInfo currentOSCSettings = { OSC_ADDRESS_DEF,  OSC_OUTPORT_DEF , OSC_INPORT_DEF };
-	// OSC Configure trigger
-	SchmittTrigger oscConfigTrigger;
-	SchmittTrigger oscConnectTrigger;
-	SchmittTrigger oscDisconnectTrigger;
-	// Show the OSC configuration screen or not.
-	bool oscShowConfigurationScreen = false;
-	// Flag to reconnect at load. IFF true and oscInitialized is also true.
-	bool oscReconnectAtLoad = false;
+	// // Current OSC IP address and port settings.
+	// TSOSCConnectionInfo currentOSCSettings = { OSC_ADDRESS_DEF,  OSC_OUTPORT_DEF , OSC_INPORT_DEF };
+	// // OSC Configure trigger
+	// SchmittTrigger oscConfigTrigger;
+	// SchmittTrigger oscConnectTrigger;
+	// SchmittTrigger oscDisconnectTrigger;
+	// // Show the OSC configuration screen or not.
+	// bool oscShowConfigurationScreen = false;
+	// // Flag to reconnect at load. IFF true and oscInitialized is also true.
+	// bool oscReconnectAtLoad = false;
 	// Flag if OSC objects have been initialized
 	bool oscInitialized = false;
-	// If there is an osc error.
-	bool oscError = false;
-	// OSC output buffer.
-	char* oscBuffer = NULL;
-	// OSC namespace to use
-	std::string oscNamespace = OSC_DEFAULT_NS;
-	// Sending OSC socket
-	UdpTransmitSocket* oscTxSocket = NULL;
-	// OSC message listener
-	TSOSCSequencerListener* oscListener = NULL;
-	// Receiving OSC socket
-	UdpListeningReceiveSocket* oscRxSocket = NULL;
-	// The OSC listener thread
-	std::thread oscListenerThread;
-	// Osc address buffer. 
-	char oscAddrBuffer[SeqOSCOutputMsg::NUM_OSC_OUTPUT_MSGS][OSC_ADDRESS_BUFFER_SIZE];
-	// Prev step that was last turned off (when going to a new step).
-	int oscLastPrevStepUpdated = TROWA_INDEX_UNDEFINED;
-	// Settings for new OSC.
-	TSOSCInfo oscNewSettings = { OSC_ADDRESS_DEF,  OSC_OUTPORT_DEF , OSC_INPORT_DEF };
-	// OSC Mode action (i.e. Enable, Disable)
-	enum OSCAction {
-		None,
-		Disable,
-		Enable
-	};
-	// Flag for our module to either enable or disable osc.
-	OSCAction oscCurrentAction = OSCAction::None;
-	// The current osc client. Clients such as touchOSC and Lemur are limited and need special treatment.
-	OSCClient oscCurrentClient = OSCClient::GenericClient;
+	// // If there is an osc error.
+	// bool oscError = false;
+	// // OSC output buffer.
+	// char* oscBuffer = NULL;
+	// // OSC namespace to use
+	// std::string oscNamespace = OSC_DEFAULT_NS;
+	// // Sending OSC socket
+	// UdpTransmitSocket* oscTxSocket = NULL;
+	// // OSC message listener
+	// TSOSCSequencerListener* oscListener = NULL;
+	// // Receiving OSC socket
+	// UdpListeningReceiveSocket* oscRxSocket = NULL;
+	// // The OSC listener thread
+	// std::thread oscListenerThread;
+	// // Osc address buffer. 
+	// char oscAddrBuffer[SeqOSCOutputMsg::NUM_OSC_OUTPUT_MSGS][OSC_ADDRESS_BUFFER_SIZE];
+	// // Prev step that was last turned off (when going to a new step).
+	// int oscLastPrevStepUpdated = TROWA_INDEX_UNDEFINED;
+	// // Settings for new OSC.
+	// TSOSCInfo oscNewSettings = { OSC_ADDRESS_DEF,  OSC_OUTPORT_DEF , OSC_INPORT_DEF };
+	// // OSC Mode action (i.e. Enable, Disable)
+	// enum OSCAction {
+	// 	None,
+	// 	Disable,
+	// 	Enable
+	// };
+	// // Flag for our module to either enable or disable osc.
+	// OSCAction oscCurrentAction = OSCAction::None;
+	// // The current osc client. Clients such as touchOSC and Lemur are limited and need special treatment.
+	// OSCClient oscCurrentClient = OSCClient::GenericClient;
 
 	// Mode /////////////////////////	
 	// The mode string.
@@ -402,28 +402,28 @@ struct TSSequencerModuleBase : Module {
 	// Calculate a representation of all channels for this step
 	virtual float getPlayingStepValue(int step, int pattern) = 0;
 
-	// Initialize OSC on the given ip and ports.
-	void initOSC(const char* ipAddress, int outputPort, int inputPort);
-	// Clean up OSC.
-	void cleanupOSC();
-	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	// Set the OSC namespace.
-	// @oscNs: (IN) The namespace for OSC.
-	// Sets the command address strings too.
-	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-	void setOSCNamespace(const char* oscNs);
+	// // Initialize OSC on the given ip and ports.
+	// void initOSC(const char* ipAddress, int outputPort, int inputPort);
+	// // Clean up OSC.
+	// void cleanupOSC();
+	// //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+	// // Set the OSC namespace.
+	// // @oscNs: (IN) The namespace for OSC.
+	// // Sets the command address strings too.
+	// //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+	// void setOSCNamespace(const char* oscNs);
 
 
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// reset(void)
 	// Reset ALL step values to default.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-	
-	void reset() override;
+	void onReset() override;
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 	// randomize(void)
 	// Only randomize the current gate/trigger steps.
 	//-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-	
-	void randomize() override
+	void onRandomize() override
 	{
 		randomize(currentPatternEditingIx, currentChannelEditingIx, false);
 		return;
@@ -766,13 +766,13 @@ struct TSSeqLabelArea : TransparentWidget {
 
 		// TINY btn labels
 		nvgFontSize(vg, fontSize * 0.6);
-		// OSC Labels
-		y = 103;
-		if (module->allowOSC)
-		{
-			x = 240;
-			nvgText(vg, x, y, "OSC", NULL);
-		}
+		// // OSC Labels
+		// y = 103;
+		// if (module->allowOSC)
+		// {
+		// 	x = 240;
+		// 	nvgText(vg, x, y, "OSC", NULL);
+		// }
 		// Copy button labels:
 		x = 302;
 		nvgText(vg, x, y, "CPY", NULL);

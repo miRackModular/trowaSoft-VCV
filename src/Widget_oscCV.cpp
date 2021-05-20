@@ -96,8 +96,8 @@ oscCVWidget::oscCVWidget(oscCV* oscModule) : TSSModuleWidgetBase(oscModule)
 	btn = dynamic_cast<LEDButton*>(ParamWidget::create<LEDButton>(Vec(x, y), oscModule, oscCV::ParamIds::OSC_SHOW_CONF_PARAM, 0, 1, 0));
 	btn->box.size = btnSize;
 	addParam(btn);
-	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x, y), oscModule, oscCV::LightIds::OSC_CONFIGURE_LIGHT, ledSize, COLOR_WHITE));
-	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x + 2, y + 2), oscModule, oscCV::LightIds::OSC_ENABLED_LIGHT, Vec(ledSize.x - 4, ledSize.y - 4), TSOSC_STATUS_COLOR));
+	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x+1.6, y+1.6), oscModule, oscCV::LightIds::OSC_CONFIGURE_LIGHT, ledSize, COLOR_WHITE));
+	addChild(TS_createColorValueLight<ColorValueLight>(Vec(x + 3.6, y + 3.6), oscModule, oscCV::LightIds::OSC_ENABLED_LIGHT, Vec(ledSize.x - 4, ledSize.y - 4), TSOSC_STATUS_COLOR));
 
 
 	xStart = TROWA_HORIZ_MARGIN;
@@ -175,6 +175,7 @@ oscCVWidget::oscCVWidget(oscCV* oscModule) : TSSModuleWidgetBase(oscModule)
 		txtField->box.size = tbPathSize;
 		txtField->box.pos = Vec(x, y + tbYOffset);
 		txtField->text = path;
+		txtField->canSquash = false;
 		if (colorizeChannels) {
 			txtField->borderColor = CHANNEL_COLORS[r];
 			txtField->caretColor = CHANNEL_COLORS[r];
@@ -224,6 +225,7 @@ oscCVWidget::oscCVWidget(oscCV* oscModule) : TSSModuleWidgetBase(oscModule)
 		txtField->box.size = tbPathSize;
 		txtField->box.pos = Vec(x, y + tbYOffset);
 		txtField->text = path;
+		txtField->canSquash = false;
 		if (colorizeChannels) {
 			txtField->borderColor = CHANNEL_COLORS[r];
 			txtField->caretColor = CHANNEL_COLORS[r];
@@ -442,7 +444,7 @@ void oscCVWidget::step()
 					debug("IP Address is not valid.");
 #endif
 					this->oscConfigurationScreen->errorMsg = "Invalid IP Address.";
-					this->oscConfigurationScreen->tbIpAddress->requestFocus();
+					// this->oscConfigurationScreen->tbIpAddress->requestFocus();
 				}
 				else if (!this->oscConfigurationScreen->isValidTxPort())
 				{
@@ -450,7 +452,7 @@ void oscCVWidget::step()
 					debug("Tx Port is not valid.");
 #endif
 					this->oscConfigurationScreen->errorMsg = "Invalid Output Port (0-" + std::to_string(0xFFFF) + ").";
-					this->oscConfigurationScreen->tbTxPort->requestFocus();
+					// this->oscConfigurationScreen->tbTxPort->requestFocus();
 
 				}
 				else if (!this->oscConfigurationScreen->isValidRxPort())
@@ -459,7 +461,7 @@ void oscCVWidget::step()
 					debug("Rx Port is not valid.");
 #endif
 					this->oscConfigurationScreen->errorMsg = "Invalid Input Port (0-" + std::to_string(0xFFFF) + ").";
-					this->oscConfigurationScreen->tbRxPort->requestFocus();
+					// this->oscConfigurationScreen->tbRxPort->requestFocus();
 				}
 				else
 				{

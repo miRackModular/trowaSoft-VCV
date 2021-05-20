@@ -129,21 +129,21 @@ struct ColorValueLight : ModuleLightWidget {
 			baseColors[0] = bColor;
 		}
 	}
-	void drawHalo(NVGcontext *vg) override {
-		float radius = box.size.x / 2.0;
-		float oradius = radius + ((outerRadiusRelative) ? (radius*outerRadiusHalo) : outerRadiusHalo);
+	// void drawHalo(NVGcontext *vg) override {
+	// 	float radius = box.size.x / 2.0;
+	// 	float oradius = radius + ((outerRadiusRelative) ? (radius*outerRadiusHalo) : outerRadiusHalo);
 
-		nvgBeginPath(vg);
-		nvgRect(vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
+	// 	nvgBeginPath(vg);
+	// 	nvgRect(vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
 
-		NVGpaint paint;
-		NVGcolor icol = colorMult(color, 0.10);
-		NVGcolor ocol = nvgRGB(0, 0, 0);
-		paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
-		nvgFillPaint(vg, paint);
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		nvgFill(vg);
-	}
+	// 	NVGpaint paint;
+	// 	NVGcolor icol = colorMult(color, 0.10);
+	// 	NVGcolor ocol = nvgRGB(0, 0, 0);
+	// 	paint = nvgRadialGradient(vg, radius, radius, radius, oradius, icol, ocol);
+	// 	nvgFillPaint(vg, paint);
+	// 	nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+	// 	nvgFill(vg);
+	// }
 };
 
 //------------------------------------------------------------------------------------------------
@@ -484,7 +484,7 @@ struct HideableLEDButton : LEDButton
 // TS_ScreenBtn - Screen button.
 //--------------------------------------------------------------
 struct TS_ScreenBtn : MomentarySwitch {
-	bool visible = true;
+	// bool visible = true;
 	// Text to display on the btn.
 	std::string btnText;
 	// Background color
@@ -704,7 +704,7 @@ struct TS_ScreenCheckBox : TS_ScreenBtn {
 //------------------------------------------------------------------------------------------------
 struct TS_LightArc : ColorValueLight {
 	// The inner radius 
-	float innerRadius = 22;	
+	float innerRadius = 20;	
 	// Pointer to current angle in radians. This is the differential like from a knob.
 	float* currentAngle_radians;
 	// Font size for our display numbers
@@ -752,7 +752,7 @@ struct TS_LightArc : ColorValueLight {
 		// svg Angles go clockwise from positive x -->
 		
 		// Inner glow
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		// nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 		nvgCircle(vg, oradius, oradius, radius);		
 		borderColor = color;
 		borderColor.a = 0.25;
@@ -775,25 +775,25 @@ struct TS_LightArc : ColorValueLight {
 		nvgStrokeColor(vg, borderColor);
 		nvgStroke(vg);
 		
-		// Outer glow
-		nvgBeginPath(vg);
-		nvgArc(vg, /*cx*/ oradius, /*cy*/ oradius, innerRadius - 3, 
-			 /*a0*/ zeroAnglePoint, /*a1*/ angle, /*dir*/ dir);
+		// // Outer glow
+		// nvgBeginPath(vg);
+		// nvgArc(vg, /*cx*/ oradius, /*cy*/ oradius, innerRadius - 3, 
+		// 	 /*a0*/ zeroAnglePoint, /*a1*/ angle, /*dir*/ dir);
 	
-		NVGpaint paint;
-		NVGcolor icol = color;
-		icol.a *= 0.8;
-		NVGcolor ocol = color;
-		ocol.a = 0.0;
-		paint = nvgRadialGradient(vg, oradius, oradius, innerRadius, oradius, icol, ocol);
-		nvgStrokeWidth(vg, oradius - innerRadius + 3);	
-		nvgStrokePaint(vg, paint);
-		nvgStroke(vg);
+		// NVGpaint paint;
+		// NVGcolor icol = color;
+		// icol.a *= 0.8;
+		// NVGcolor ocol = color;
+		// ocol.a = 0.0;
+		// paint = nvgRadialGradient(vg, oradius, oradius, innerRadius, oradius, icol, ocol);
+		// nvgStrokeWidth(vg, oradius - innerRadius + 3);	
+		// nvgStrokePaint(vg, paint);
+		// nvgStroke(vg);
 					
 		if (numericValue != NULL)
 		{
 			nvgBeginPath(vg);
-			nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER);//Restore to default.
+			// nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER);//Restore to default.
 			NVGcolor textColor = COLOR_WHITE;
 			nvgFontSize(vg, fontSize); 	
 			nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
@@ -888,6 +888,7 @@ struct TS_LightString : ColorValueLight
 		
 		// Solid
 		nvgBeginPath(vg);
+		nvgRoundedRect(vg, /*x*/ 0, /*y*/ 0, /*w*/ 2*radius, /*h*/ 2*radiusY, cornerRadius);
 		// Border
 		nvgStrokeWidth(vg, 1.0);
 		NVGcolor borderColor = bgColor;
@@ -896,28 +897,29 @@ struct TS_LightString : ColorValueLight
 		nvgStroke(vg);
 		
 		// Inner glow
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		// nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		color.a *= 0.5;
 		nvgFillColor(vg, color);
 		nvgFill(vg);
 
-		// Outer glow
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, /*x*/ radius - oradius, /*y*/ radiusY - oradiusY, /*w*/ 3*oradius, /*h*/ 2*oradiusY, cornerRadius);
-		NVGpaint paint;
-		NVGcolor icol = outerColor;// color;
-		icol.a *= 0.5;
-		NVGcolor ocol = outerColor;// color;
-		ocol.a = 0.0;
-		float feather = 3;
-		// Feather defines how blurry the border of the rectangle is.
-		paint = nvgBoxGradient(vg, /*x*/ 0, /*y*/ 0, /*w*/ box.size.x, /*h*/ oradiusY - 10, 
-			/*r: corner radius*/ cornerRadius, /*f: feather*/ feather, 
-			/*inner color*/ icol, /*outer color */ ocol);
-		nvgFillPaint(vg, paint);
-		nvgFill(vg);
+		// // Outer glow
+		// nvgBeginPath(vg);
+		// nvgRoundedRect(vg, /*x*/ radius - oradius, /*y*/ radiusY - oradiusY, /*w*/ 3*oradius, /*h*/ 2*oradiusY, cornerRadius);
+		// NVGpaint paint;
+		// NVGcolor icol = outerColor;// color;
+		// icol.a *= 0.5;
+		// NVGcolor ocol = outerColor;// color;
+		// ocol.a = 0.0;
+		// float feather = 3;
+		// // Feather defines how blurry the border of the rectangle is.
+		// paint = nvgBoxGradient(vg, /*x*/ 0, /*y*/ 0, /*w*/ box.size.x, /*h*/ oradiusY - 10, 
+		// 	/*r: corner radius*/ cornerRadius, /*f: feather*/ feather, 
+		// 	/*inner color*/ icol, /*outer color */ ocol);
+		// nvgFillPaint(vg, paint);
+		// nvgFill(vg);
 		
 		nvgBeginPath(vg);
-		nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER);//Restore to default.
+		// nvgGlobalCompositeOperation(vg, NVG_SOURCE_OVER);//Restore to default.
 		NVGcolor textColor = baseColor;
 		nvgFillColor(vg, textColor);
 		nvgFontSize(vg, fontSize);
@@ -961,25 +963,25 @@ struct TS_LightSquare : ColorValueLight
 		nvgStroke(vg);
 
 		// Inner glow
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		// nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
 		nvgFillColor(vg, color);
 		nvgFill(vg);
 
-		// Outer glow
-		nvgBeginPath(vg);
-		nvgRoundedRect(vg, /*x*/ radius - oradius, /*y*/ radius - oradius, /*w*/ 2*oradius, /*h*/ 2*oradius, cornerRadius);
-		NVGpaint paint;
-		NVGcolor icol = outerColor;// color;
-		icol.a *= 0.25;
-		NVGcolor ocol = outerColor;// color;
-		ocol.a = 0.0;
-		float feather = 2;
-		// Feather defines how blurry the border of the rectangle is. // Fixed 01/19/2018, made it too tiny before
-		paint = nvgBoxGradient(vg, /*x*/ radius - oradius, /*y*/ radius - oradius, /*w*/ 2 * oradius, /*h*/ 2 * oradius,  //vg, /*x*/ -5, /*y*/ -5, /*w*/ 2*oradius + 10, /*h*/ 2*oradius + 10, 
-			/*r: corner radius*/ cornerRadius, /*f: feather*/ feather, 
-			/*inner color*/ icol, /*outer color */ ocol);
-		nvgFillPaint(vg, paint);
-		nvgFill(vg);
+		// // Outer glow
+		// nvgBeginPath(vg);
+		// nvgRoundedRect(vg, /*x*/ radius - oradius, /*y*/ radius - oradius, /*w*/ 2*oradius, /*h*/ 2*oradius, cornerRadius);
+		// NVGpaint paint;
+		// NVGcolor icol = outerColor;// color;
+		// icol.a *= 0.25;
+		// NVGcolor ocol = outerColor;// color;
+		// ocol.a = 0.0;
+		// float feather = 2;
+		// // Feather defines how blurry the border of the rectangle is. // Fixed 01/19/2018, made it too tiny before
+		// paint = nvgBoxGradient(vg, /*x*/ radius - oradius, /*y*/ radius - oradius, /*w*/ 2 * oradius, /*h*/ 2 * oradius,  //vg, /*x*/ -5, /*y*/ -5, /*w*/ 2*oradius + 10, /*h*/ 2*oradius + 10, 
+		// 	/*r: corner radius*/ cornerRadius, /*f: feather*/ feather, 
+		// 	/*inner color*/ icol, /*outer color */ ocol);
+		// nvgFillPaint(vg, paint);
+		// nvgFill(vg);
 		return;
 	}
 }; // end TS_LightSquare
@@ -1010,27 +1012,27 @@ struct TS_LightRing : ColorValueLight
 		// Border
 		nvgStrokeWidth(vg, radius - innerRadius);
 		NVGcolor borderColor = bgColor;
-		borderColor.a *= 1.0;
+		borderColor.a = 0.5 + module->lights[firstLightId].value;
 		nvgStrokeColor(vg, borderColor);
 		nvgStroke(vg);
 
 		// Inner glow
-		nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
-		//nvgFillColor(vg, color);
-		//nvgFill(vg);
+		// nvgGlobalCompositeOperation(vg, NVG_LIGHTER);
+		// nvgFillColor(vg, color);
+		// nvgFill(vg);
 
-		// Outer glow
-		nvgBeginPath(vg);
-		nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
-		NVGpaint paint;
-		NVGcolor icol = color;
-		icol.a *= (module != NULL) ? module->lights[firstLightId].value : 0;
-		//icol.a *= value;
-		NVGcolor ocol = color;
-		ocol.a = 0.0;
-		paint = nvgRadialGradient(vg, radius, radius, innerRadius, oradius, icol, ocol);
-		nvgFillPaint(vg, paint);
-		nvgFill(vg);
+		// // Outer glow
+		// nvgBeginPath(vg);
+		// nvgRect(vg, radius - oradius, radius - oradius, 2*oradius, 2*oradius);
+		// NVGpaint paint;
+		// NVGcolor icol = color;
+		// icol.a *= (module != NULL) ? module->lights[firstLightId].value : 0;
+		// //icol.a *= value;
+		// NVGcolor ocol = color;
+		// ocol.a = 0.0;
+		// paint = nvgRadialGradient(vg, radius, radius, innerRadius, oradius, icol, ocol);
+		// nvgFillPaint(vg, paint);
+		// nvgFill(vg);
 		return;
 	}
 };
@@ -1084,12 +1086,9 @@ struct TS_20_BlackEncoder : RoundKnob {
 	// Override to allow pseudo endless encoding (still bound by some real values).
 	void onDragMove(EventDragMove &e) override {
 		float range = rotationRangeMax - rotationRangeMin;
-		float delta = KNOB_SENSITIVITY * -e.mouseRel.y * speed * range;
-		// Drag slower if Mod is held
-		if (windowIsModPressed())
-			delta *= fineControlMult; // Finer control
-		else if (windowIsShiftPressed())
-			delta *= coarseControlMult; // Coarser control
+		float delta = KNOB_SENSITIVITY * (e.mouseRel.x-e.mouseRel.y) * speed * range;
+	    if (windowIsFineMode())
+    	    delta /= 16.0;
 		dragValue += delta;
 		dragValue = clamp2(dragValue, minValue, maxValue);
 		if (snap)
@@ -1122,57 +1121,57 @@ struct TS_20_BlackEncoder : RoundKnob {
 // (by just making the lights transparent... TODO: get rid of light completely.)
 //--------------------------------------------------------------
 struct TS_Port : SVGPort {
-	NVGcolor negColor;
-	NVGcolor posColor;
+	// NVGcolor negColor;
+	// NVGcolor posColor;
 	
 	TS_Port() : SVGPort() {
 		background->svg = SVG::load(assetPlugin(plugin, "res/ComponentLibrary/TS_Port.svg"));
 		background->wrap();
 		box.size = background->box.size;
-		if (plugLight)
-		{
-			negColor = plugLight->baseColors[1];
-			posColor = plugLight->baseColors[0];
-		}
+		// if (plugLight)
+		// {
+		// 	negColor = plugLight->baseColors[1];
+		// 	posColor = plugLight->baseColors[0];
+		// }
 	}
 	void disableLights()
 	{
 		// Save our colors:
-		if (plugLight)
-		{
-			negColor = plugLight->baseColors[1];
-			posColor = plugLight->baseColors[0];		
-			plugLight->baseColors[0] = nvgRGBAf(0,0,0,0);
-			plugLight->baseColors[1] = nvgRGBAf(0,0,0,0);		
-		}
+		// if (plugLight)
+		// {
+		// 	negColor = plugLight->baseColors[1];
+		// 	posColor = plugLight->baseColors[0];		
+		// 	plugLight->baseColors[0] = nvgRGBAf(0,0,0,0);
+		// 	plugLight->baseColors[1] = nvgRGBAf(0,0,0,0);		
+		// }
 	}
 	void enableLights()
 	{
-		if (plugLight)
-		{
-			plugLight->baseColors[1] = negColor;
-			plugLight->baseColors[0] = posColor;		
-		}
+		// if (plugLight)
+		// {
+		// 	plugLight->baseColors[1] = negColor;
+		// 	plugLight->baseColors[0] = posColor;		
+		// }
 	}
 	void setLightColor(NVGcolor color)
 	{		
-		negColor = color;
-		posColor = color;
-		if (plugLight)
-		{
-			plugLight->baseColors[0] = color;
-			plugLight->baseColors[1] = color;
-		}
+		// negColor = color;
+		// posColor = color;
+		// if (plugLight)
+		// {
+		// 	plugLight->baseColors[0] = color;
+		// 	plugLight->baseColors[1] = color;
+		// }
 	}
 	void setLightColor(NVGcolor negativeColor, NVGcolor positiveColor)
 	{
-		negColor = negativeColor;
-		posColor = positiveColor;
-		if (plugLight)
-		{
-			plugLight->baseColors[1] = negativeColor;
-			plugLight->baseColors[2] = positiveColor;			
-		}
+		// negColor = negativeColor;
+		// posColor = positiveColor;
+		// if (plugLight)
+		// {
+		// 	plugLight->baseColors[1] = negativeColor;
+		// 	plugLight->baseColors[2] = positiveColor;			
+		// }
 	}	
 };
 
@@ -1338,7 +1337,7 @@ struct TS_SVGPanel : SVGPanel
 //--------------------------------------------------------------
 struct TS_ColorSlider : Knob {
 	// If this control should be rendered
-	bool visible = true;
+	// bool visible = true;
 	// Starting color.
 	TSColorHSL startColorHSL;
 	// Ending color.
